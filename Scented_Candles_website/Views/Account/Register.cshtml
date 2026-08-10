@@ -1,0 +1,366 @@
+﻿@model RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <!-- Header with Maroon Gradient -->
+                <div class="card-header text-white text-center py-4" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); border: none;">
+                    <div class="mb-3">
+                        <i class="fas fa-user-plus fa-4x" style="filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold">Create Your Account</h3>
+                    <p class="mb-0 mt-2 small" style="opacity: 0.9;">Join our aromatic community</p>
+                </div>
+
+                <div class="card-body p-4" style="background: white;">
+                    <!-- Display TempData error if any -->
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show border-0 rounded-3 mb-4" role="alert" style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); color: #721c24; border-left: 4px solid #dc3545;">
+                            <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 rounded-3 mb-4" style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); color: #721c24; border-left: 4px solid #dc3545;"></div>
+
+                        <!-- First Name Field -->
+                        <div class="form-group mb-4">
+                            <label asp-for="FirstName" class="form-label fw-semibold" style="color: #4a0000;">
+                                <i class="fas fa-user me-2"></i>First Name
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text border-0 bg-light" style="border-radius: 12px 0 0 12px;">
+                                    <i class="fas fa-user" style="color: #800000;"></i>
+                                </span>
+                                <input asp-for="FirstName" class="form-control" placeholder="Enter your first name" style="border-radius: 0 12px 12px 0; border-left: none;" />
+                            </div>
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Last Name Field -->
+                        <div class="form-group mb-4">
+                            <label asp-for="LastName" class="form-label fw-semibold" style="color: #4a0000;">
+                                <i class="fas fa-user me-2"></i>Last Name
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text border-0 bg-light" style="border-radius: 12px 0 0 12px;">
+                                    <i class="fas fa-user" style="color: #800000;"></i>
+                                </span>
+                                <input asp-for="LastName" class="form-control" placeholder="Enter your last name" style="border-radius: 0 12px 12px 0; border-left: none;" />
+                            </div>
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="form-group mb-4">
+                            <label asp-for="Email" class="form-label fw-semibold" style="color: #4a0000;">
+                                <i class="fas fa-envelope me-2"></i>Email Address
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text border-0 bg-light" style="border-radius: 12px 0 0 12px;">
+                                    <i class="fas fa-envelope" style="color: #800000;"></i>
+                                </span>
+                                <input asp-for="Email" class="form-control" placeholder="Enter your email" style="border-radius: 0 12px 12px 0; border-left: none;" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="form-group mb-4">
+                            <label asp-for="Password" class="form-label fw-semibold" style="color: #4a0000;">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text border-0 bg-light" style="border-radius: 12px 0 0 12px;">
+                                    <i class="fas fa-key" style="color: #800000;"></i>
+                                </span>
+                                <input asp-for="Password" class="form-control" type="password" placeholder="Create a strong password" style="border-radius: 0 12px 12px 0; border-left: none;" />
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                            <div class="mt-2" id="passwordStrength"></div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>Password must be at least 6 characters, contain 1 uppercase, 1 lowercase, and 1 number.
+                            </small>
+                        </div>
+
+                        <!-- Confirm Password Field -->
+                        <div class="form-group mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label fw-semibold" style="color: #4a0000;">
+                                <i class="fas fa-check-circle me-2"></i>Confirm Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text border-0 bg-light" style="border-radius: 12px 0 0 12px;">
+                                    <i class="fas fa-check" style="color: #800000;"></i>
+                                </span>
+                                <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="Confirm your password" style="border-radius: 0 12px 12px 0; border-left: none;" />
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Register Button -->
+                        <div class="d-grid gap-2 mb-4">
+                            <button type="submit" class="btn btn-lg fw-bold text-white" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); border: none; border-radius: 50px; padding: 12px; transition: all 0.3s ease;">
+                                <i class="fas fa-user-plus me-2"></i> Create Account
+                            </button>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="position-relative text-center my-4">
+                            <hr class="border-secondary" style="opacity: 0.3;">
+                            <span class="position-absolute top-50 start-50 translate-middle bg-white px-3" style="color: #6c757d; font-size: 14px;">OR</span>
+                        </div>
+
+                        
+                    </form>
+                </div>
+
+                <!-- Footer with Login Link -->
+                <div class="card-footer text-center py-3" style="background: #f8f9fa; border-top: 1px solid rgba(0,0,0,0.05);">
+                    <p class="mb-0" style="color: #4a0000;">
+                        Already have an account?
+                        <a asp-action="Login" class="fw-bold text-decoration-none" style="color: #800000;">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login here
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS for Hover Effects and Password Strength -->
+<style>
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(128, 0, 0, 0.3);
+    }
+
+    .form-control:focus {
+        border-color: #800000;
+        box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
+    }
+
+    .input-group-text {
+        background: #f8f9fa;
+        border-right: none;
+    }
+
+    .input-group .form-control:focus {
+        border-left: none;
+        box-shadow: none;
+    }
+
+    .card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @@keyframes slideDown {
+        from {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Password Strength Indicator Styles */
+    .password-strength-weak {
+        background: #dc3545;
+        height: 3px;
+        width: 33%;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+    }
+
+    .password-strength-fair {
+        background: #ffc107;
+        height: 3px;
+        width: 66%;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+    }
+
+    .password-strength-good {
+        background: #17a2b8;
+        height: 3px;
+        width: 100%;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+    }
+
+    .password-strength-strong {
+        background: #28a745;
+        height: 3px;
+        width: 100%;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+    }
+
+    .strength-text {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function () {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+
+        // Password strength checker
+        const passwordInput = document.getElementById('Password');
+        const strengthDiv = document.getElementById('passwordStrength');
+
+        function checkPasswordStrength(password) {
+            let strength = 0;
+
+            if (password.length >= 6) strength++;
+            if (password.match(/[a-z]+/)) strength++;
+            if (password.match(/[A-Z]+/)) strength++;
+            if (password.match(/[0-9]+/)) strength++;
+
+            let strengthText = '';
+            let strengthClass = '';
+            let barClass = '';
+
+            switch (strength) {
+                case 1:
+                    strengthText = 'Weak';
+                    strengthClass = 'text-danger';
+                    barClass = 'password-strength-weak';
+                    break;
+                case 2:
+                    strengthText = 'Fair';
+                    strengthClass = 'text-warning';
+                    barClass = 'password-strength-fair';
+                    break;
+                case 3:
+                    strengthText = 'Good';
+                    strengthClass = 'text-info';
+                    barClass = 'password-strength-good';
+                    break;
+                case 4:
+                    strengthText = 'Strong';
+                    strengthClass = 'text-success';
+                    barClass = 'password-strength-strong';
+                    break;
+                default:
+                    strengthText = 'Very Weak';
+                    strengthClass = 'text-danger';
+                    barClass = 'password-strength-weak';
+            }
+
+            return { strengthText, strengthClass, barClass, strength };
+        }
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function () {
+                const password = this.value;
+                const result = checkPasswordStrength(password);
+
+                if (password.length > 0) {
+                    strengthDiv.innerHTML = `
+                                <div class="mt-2">
+                                    <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                                        <div style="flex: 1; height: 4px; background: #e9ecef; border-radius: 2px;">
+                                            <div class="${result.barClass}" style="height: 100%; border-radius: 2px;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="${result.strengthClass} strength-text">
+                                        <i class="fas fa-shield-alt me-1"></i>Password Strength: ${result.strengthText}
+                                    </div>
+                                </div>
+                            `;
+                } else {
+                    strengthDiv.innerHTML = '';
+                }
+            });
+        }
+
+        // Real-time password confirmation check
+        const confirmPasswordInput = document.getElementById('ConfirmPassword');
+        const passwordInputForConfirm = document.getElementById('Password');
+
+        function checkPasswordMatch() {
+            if (confirmPasswordInput && passwordInputForConfirm) {
+                const password = passwordInputForConfirm.value;
+                const confirm = confirmPasswordInput.value;
+
+                if (confirm.length > 0) {
+                    if (password === confirm) {
+                        confirmPasswordInput.style.borderColor = '#28a745';
+                        // Remove any existing mismatch message
+                        const existingMsg = document.getElementById('passwordMismatchMsg');
+                        if (existingMsg) existingMsg.remove();
+                    } else {
+                        confirmPasswordInput.style.borderColor = '#dc3545';
+                        // Add mismatch message if not exists
+                        if (!document.getElementById('passwordMismatchMsg')) {
+                            const msg = document.createElement('div');
+                            msg.id = 'passwordMismatchMsg';
+                            msg.className = 'text-danger small mt-1';
+                            msg.innerHTML = '<i class="fas fa-times-circle me-1"></i>Passwords do not match';
+                            confirmPasswordInput.parentNode.parentNode.appendChild(msg);
+                        }
+                    }
+                } else {
+                    confirmPasswordInput.style.borderColor = '';
+                    const existingMsg = document.getElementById('passwordMismatchMsg');
+                    if (existingMsg) existingMsg.remove();
+                }
+            }
+        }
+
+        if (confirmPasswordInput) {
+            confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+        }
+        if (passwordInputForConfirm) {
+            passwordInputForConfirm.addEventListener('input', checkPasswordMatch);
+        }
+
+        // Floating label effect (optional)
+        const inputs = document.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function () {
+                this.parentElement.classList.add('focused');
+            });
+            input.addEventListener('blur', function () {
+                if (!this.value) {
+                    this.parentElement.classList.remove('focused');
+                }
+            });
+        });
+    </script>
+}

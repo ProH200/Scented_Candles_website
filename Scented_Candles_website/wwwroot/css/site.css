@@ -1,0 +1,349 @@
+/* Avatar Circle Styles */
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.initials {
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Badge Enhancements */
+.badge {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 20px;
+}
+
+    .badge i {
+        margin-right: 5px;
+    }
+
+/* Table Enhancements */
+.table-hover tbody tr:hover {
+    background-color: #f8f9fc;
+    transition: all 0.3s ease;
+}
+
+/* Modal Enhancements */
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-header {
+    border-radius: 10px 10px 0 0;
+}
+
+/* Card Enhancements */
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0;
+}
+
+/* Button Enhancements */
+.btn {
+    border-radius: 5px;
+    padding: 8px 16px;
+    font-weight: 500;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+/* Form Control Enhancements */
+.form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Switch Toggle */
+.form-switch .form-check-input {
+    width: 3em;
+    height: 1.5em;
+}
+
+    .form-switch .form-check-input:checked {
+        background-color: #4e73df;
+        border-color: #4e73df;
+    }
+/* Status Badges */
+.badge-status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+    .badge-status.pending {
+        background: #ffc107;
+        color: #000;
+    }
+
+    .badge-status.processing {
+        background: #17a2b8;
+        color: #fff;
+    }
+
+    .badge-status.shipped {
+        background: #007bff;
+        color: #fff;
+    }
+
+    .badge-status.delivered {
+        background: #28a745;
+        color: #fff;
+    }
+
+    .badge-status.cancelled {
+        background: #dc3545;
+        color: #fff;
+    }
+
+/* Table Enhancements */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Form Enhancements */
+.form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Modal Enhancements */
+.modal-header .btn-close {
+    background-color: white;
+    opacity: 0.8;
+}
+
+    .modal-header .btn-close:hover {
+        opacity: 1;
+    }
+/* Candle Flame Effect */
+.candle-flame {
+    position: relative;
+    display: inline-block;
+}
+
+    .candle-flame::before {
+        content: "??";
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: flicker 1s ease-in-out infinite;
+    }
+
+/* Hover Glow Effect */
+.product-card:hover .candle-img {
+    filter: brightness(1.05);
+    transition: filter 0.3s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+/* Loading Animation */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+/* Navbar improvements */
+.navbar-brand {
+    font-weight: 600;
+    color: #4e73df !important;
+}
+
+.nav-link i {
+    margin-right: 5px;
+}
+
+/* Cart badge positioning */
+.position-relative .badge {
+    margin-top: -8px;
+    margin-left: -5px;
+}
+
+/* Alert animations */
+.alert {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Footer styling */
+.footer {
+    margin-top: auto;
+    padding: 1rem 0;
+}
+
+/* Dropdown hover effects */
+.dropdown-item:hover {
+    background-color: #f8f9fc;
+}
+
+/* Badge styling */
+.badge {
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+}
+/* Global Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fafafa;
+}
+
+/* Navbar Active Link */
+.navbar-nav .nav-link.active {
+    color: #ffc107 !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffc107 !important;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Dropdown Styles */
+.dropdown-menu-dark .dropdown-item:hover {
+    background: #800000;
+    color: white;
+}
+
+/* Alert Animations */
+.alert {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Social Links Hover */
+.social-links a {
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+    .social-links a:hover {
+        transform: translateY(-3px);
+        color: #ffc107 !important;
+    }
+
+/* Footer Links Hover */
+.footer a:hover {
+    color: #ffc107 !important;
+    padding-left: 5px;
+    transition: all 0.3s ease;
+}
+
+/* Cart Badge Animation */
+#cartCountBadge {
+    animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .footer {
+        text-align: center;
+    }
+
+    .social-links {
+        text-align: center;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #800000;
+    border-radius: 4px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #5a0000;
+    }
+

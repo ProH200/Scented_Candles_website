@@ -1,0 +1,24 @@
+
+========================================
+Date: 2026-08-08 13:54:10
+To: Promise@gmail.com
+User: Promise
+Type: Password Reset
+Reset Link: https://localhost:7108/Account/ResetPassword?token=CfDJ8O0ces4QG9VJrXsUnq6evZyIEF4zbyHTgkzFJTSC3rswLMXYzuxehE60cCu6lPmsPHyqgE%2B1IY%2Fj%2F5a6fXxa9UGqwcHBW8DeG2u8I5CHNXm%2FOvhSrnHyvcmp1EH%2F7pQ%2FJsXOzpS1MMQ%2BIY5b1uYVWR2YU4055oCho%2FxnOhW6mHjfpVq%2BPSOXOAaeuBU3bU%2FreZAi%2Bz3S3o0MSeQwY7XvmD6F77ro5inWHrnpbMf9KF%2FU&email=Promise@gmail.com
+========================================
+
+========================================
+Date: 2026-08-08 13:54:41
+To: Promisemnelisi@gmail.com
+User: Promise
+Type: Password Reset
+Reset Link: https://localhost:7108/Account/ResetPassword?token=CfDJ8O0ces4QG9VJrXsUnq6evZzi3aYor4Yp1r8EQ2Q6NipofVUN5b7buwjNt%2BsFT8SgeKCCfDXx2orTKJ%2FzK5uzEvtKgEEq%2B6wpZBGheAwIG4ybwyS2fACeLenUugxkYUXL85Myq2FiK2XgAUlpoVUiWWivwEzE4RtnoDF0CwjvcDnWUTfVqKZxyzAOw0VS8hWrjw7wmS2pnp8oc%2Bm39DOwFmk1QNKLEt%2FrJ1DGUU0u5WU4&email=Promisemnelisi@gmail.com
+========================================
+
+========================================
+Date: 2026-08-08 13:57:33
+To: Promisemnelisi@gmail.com
+User: Promise
+Type: Password Reset
+Reset Link: https://localhost:7108/Account/ResetPassword?token=CfDJ8O0ces4QG9VJrXsUnq6evZz9nbuL0L%2BwjfMo8nVxgnGB3LhzDcAMlLSeWJdAwQBkbgA2m7sgkXxP0Yn24Wj1cyuz55rs9MCvWx1AnVSzHFNkvTw06ow%2BOxT%2Fv9iTTvqoGXNufS8H%2BRJSUXGpqSXhKonxC%2B5YUrk5jDwbZLcEjtSpbg2HTvJGkXZ9tBti5nVGTpPwWT0jTErgQ0o9BiQvnS8n8ZVhdRLx%2BggakDQjfNQz&email=Promisemnelisi@gmail.com
+========================================

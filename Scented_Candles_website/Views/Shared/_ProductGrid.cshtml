@@ -1,0 +1,64 @@
+﻿@model List<Product>
+
+@if (Model.Any())
+{
+    <div class="products-grid">
+        @foreach (var product in Model)
+        {
+            <div class="product-card">
+                <div class="product-image-wrap">
+                    @if (product.IsFeatured)
+                    {
+                        <div class="product-badge badge-featured">Featured</div>
+                    }
+                    @if (product.IsOnSale)
+                    {
+                        <div class="product-badge badge-sale">@(product.DiscountPercentage ?? 0)% OFF</div>
+                    }
+                    @if (product.CreatedAt > DateTime.UtcNow.AddDays(-30))
+                    {
+                        <div class="product-badge badge-new" style="top: 56px;">New</div>
+                    }
+                    <img src="@product.ImageUrl" alt="@product.Name"
+                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1603006905003-be475563bc59?w=400&h=260&fit=crop'">
+                </div>
+                <div class="product-info">
+                    <div class="product-category">@product.Category?.Name ?? "Uncategorized"</div>
+                    <div class="product-name">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id">
+                            @product.Name
+                        </a>
+                    </div>
+                    <div class="product-scent">
+                        <i class="fas fa-leaf"></i> @product.Scent
+                    </div>
+                    <div class="product-bottom">
+                        <div class="product-price">
+                            @if (product.IsOnSale && product.SalePrice.HasValue)
+                            {
+                                <span class="sale-price">$@product.SalePrice.Value.ToString("F2")</span>
+                                <span class="original">$@product.Price.ToString("F2")</span>
+                            }
+                            else
+                            {
+                                <span>$@product.Price.ToString("F2")</span>
+                            }
+                        </div>
+                        <button class="btn-quick-add" onclick="addToCart(@product.Id)" title="Add to Cart">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="fas fa-candle-holder"></i>
+        <h3>No candles found</h3>
+        <p>Try adjusting your filters or search terms</p>
+        <a asp-action="Index" class="btn-primary">View All Candles</a>
+    </div>
+}

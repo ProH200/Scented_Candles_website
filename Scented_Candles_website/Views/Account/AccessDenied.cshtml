@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="text-center mb-0">Access Denied</h3>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-lock fa-4x text-danger mb-3"></i>
+                    <h4>You don't have permission to access this page</h4>
+                    <p>This area is restricted to @ViewData["RequiredRole"] users only.</p>
+                    <a asp-action="Index" asp-controller="Home" class="btn btn-primary">Return to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

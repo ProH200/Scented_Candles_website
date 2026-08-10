@@ -1,0 +1,570 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0" style="color: #800000;">
+            <i class="fas fa-tachometer-alt" style="color: #800000;"></i> Dashboard
+        </h1>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm" id="expandAllBtn" onclick="expandAllSections()" style="background: #800000; color: white; border: none; border-radius: 20px; padding: 6px 16px;">
+                <i class="fas fa-expand-alt"></i> Expand All
+            </button>
+            <button class="btn btn-sm btn-outline-secondary ms-2" id="collapseAllBtn" onclick="collapseAllSections()" style="border-radius: 20px; border-color: #800000; color: #800000; padding: 6px 16px;">
+                <i class="fas fa-compress-alt"></i> Collapse All
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards Row -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; border-left: 4px solid #800000; background: white;">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #800000; font-size: 0.7rem;">
+                                Total Products
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" style="color: #800000; font-size: 1.5rem;">@ViewBag.TotalProducts</div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(128, 0, 0, 0.1);">
+                                <i class="fas fa-candle" style="color: #800000; font-size: 20px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; border-left: 4px solid #800000; background: white;">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #800000; font-size: 0.7rem;">
+                                Total Orders
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold" style="color: #800000; font-size: 1.5rem;">@ViewBag.TotalOrders</div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(128, 0, 0, 0.1);">
+                                <i class="fas fa-shopping-cart" style="color: #800000; font-size: 20px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; border-left: 4px solid #800000; background: white;">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #800000; font-size: 0.7rem;">
+                                Total Users
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold" style="color: #800000; font-size: 1.5rem;">@ViewBag.TotalUsers</div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(128, 0, 0, 0.1);">
+                                <i class="fas fa-users" style="color: #800000; font-size: 20px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; border-left: 4px solid #800000; background: white;">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #800000; font-size: 0.7rem;">
+                                Total Revenue
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold" style="color: #800000; font-size: 1.5rem;">@ViewBag.TotalRevenue?.ToString("C")</div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(128, 0, 0, 0.1);">
+                                <i class="fas fa-dollar-sign" style="color: #800000; font-size: 20px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="row">
+        <!-- Quick Actions Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden; background: white;">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="cursor: pointer; background: #800000; color: white; border: none;" onclick="toggleSection('quickActionsSection')">
+                    <h6 class="m-0 fw-bold">
+                        <i class="fas fa-bolt me-2"></i> Quick Actions
+                    </h6>
+                    <i class="fas fa-chevron-down" id="quickActionsIcon" style="color: white;"></i>
+                </div>
+                <div class="card-body" id="quickActionsSection" style="background: white; padding: 20px;">
+                    <div class="d-grid gap-2">
+                        <a asp-action="CreateProduct" class="btn" style="background: #800000; color: white; border: none; border-radius: 12px; padding: 12px; font-weight: 500;">
+                            <i class="fas fa-plus me-2"></i> Add New Candle
+                        </a>
+                        <a asp-action="Products" class="btn" style="background: white; color: #800000; border: 2px solid #800000; border-radius: 12px; padding: 12px; font-weight: 500;">
+                            <i class="fas fa-candle me-2"></i> Manage Products
+                        </a>
+                        <a asp-action="Orders" class="btn" style="background: white; color: #800000; border: 2px solid #800000; border-radius: 12px; padding: 12px; font-weight: 500;">
+                            <i class="fas fa-shopping-cart me-2"></i> Manage Orders
+                        </a>
+                        <a asp-action="Users" class="btn" style="background: white; color: #800000; border: 2px solid #800000; border-radius: 12px; padding: 12px; font-weight: 500;">
+                            <i class="fas fa-users me-2"></i> Manage Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden; background: white;">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="cursor: pointer; background: #800000; color: white; border: none;" onclick="toggleSection('recentActivitySection')">
+                    <h6 class="m-0 fw-bold">
+                        <i class="fas fa-history me-2"></i> Recent Activity
+                    </h6>
+                    <i class="fas fa-chevron-down" id="recentActivityIcon" style="color: white;"></i>
+                </div>
+                <div class="card-body" id="recentActivitySection" style="background: white; padding: 20px; max-height: 400px; overflow-y: auto;">
+                    <div class="timeline">
+                        @if (ViewBag.RecentOrders != null && ViewBag.RecentOrders.Count > 0)
+                        {
+                            foreach (var order in ViewBag.RecentOrders)
+                            {
+                                <div class="timeline-item">
+                                    <div class="timeline-icon" style="background: #800000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px;">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <div class="timeline-content" style="border-left: 3px solid #800000; padding: 10px 15px; background: #f8f9fa; border-radius: 8px;">
+                                        <div class="d-flex flex-wrap justify-content-between align-items-center">
+                                            <strong style="color: #800000;">Order #@order.Id</strong>
+                                            <small class="text-muted">@order.OrderDate.ToString("MMM dd, HH:mm")</small>
+                                        </div>
+                                        <p class="mb-1" style="font-size: 0.9rem;">@order.User?.FirstName @order.User?.LastName - <span style="color: #800000; font-weight: 600;">@order.TotalAmount.ToString("C")</span></p>
+                                        <span class="badge" style="background: #800000; color: white; font-size: 0.7rem; padding: 3px 12px;">
+                                            @order.Status
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center py-3">No recent activity</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Statistics Section -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden; background: white;">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="cursor: pointer; background: #800000; color: white; border: none;" onclick="toggleSection('statisticsSection')">
+                    <h6 class="m-0 fw-bold">
+                        <i class="fas fa-chart-line me-2"></i> Detailed Statistics
+                    </h6>
+                    <i class="fas fa-chevron-down" id="statisticsIcon" style="color: white;"></i>
+                </div>
+                <div class="card-body" id="statisticsSection" style="background: white; padding: 20px;">
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3 text-center">
+                            <div class="stat-box p-3" style="background: rgba(128, 0, 0, 0.05); border-radius: 12px;">
+                                <h4 style="color: #800000; font-weight: 700; margin-bottom: 4px;">@ViewBag.ActiveProducts</h4>
+                                <small class="text-muted" style="font-size: 0.8rem;">Active Products</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 text-center">
+                            <div class="stat-box p-3" style="background: rgba(255, 193, 7, 0.1); border-radius: 12px;">
+                                <h4 style="color: #856404; font-weight: 700; margin-bottom: 4px;">@ViewBag.LowStockProducts</h4>
+                                <small class="text-muted" style="font-size: 0.8rem;">Low Stock Items</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 text-center">
+                            <div class="stat-box p-3" style="background: rgba(220, 53, 69, 0.08); border-radius: 12px;">
+                                <h4 style="color: #dc3545; font-weight: 700; margin-bottom: 4px;">@ViewBag.OutOfStockProducts</h4>
+                                <small class="text-muted" style="font-size: 0.8rem;">Out of Stock</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 text-center">
+                            <div class="stat-box p-3" style="background: rgba(128, 0, 0, 0.05); border-radius: 12px;">
+                                <h4 style="color: #800000; font-weight: 700; margin-bottom: 4px;">@ViewBag.CompletedOrders</h4>
+                                <small class="text-muted" style="font-size: 0.8rem;">Completed Orders</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Products Table -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden; background: white;">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="cursor: pointer; background: #800000; color: white; border: none;" onclick="toggleSection('productsTableSection')">
+                    <h6 class="m-0 fw-bold">
+                        <i class="fas fa-candle me-2"></i> Recent Products
+                    </h6>
+                    <i class="fas fa-chevron-down" id="productsTableIcon" style="color: white;"></i>
+                </div>
+                <div class="card-body p-0" id="productsTableSection" style="background: white;">
+                    <div class="table-responsive" style="overflow-x: auto;">
+                        <table class="table table-hover mb-0" style="font-size: 0.85rem;">
+                            <thead style="background: #f8f9fa;">
+                                <tr style="color: #800000;">
+                                    <th style="padding: 10px 8px 10px 20px;">Name</th>
+                                    <th style="padding: 10px 8px;">Scent</th>
+                                    <th style="padding: 10px 8px;">Price</th>
+                                    <th style="padding: 10px 8px;">Stock</th>
+                                    <th style="padding: 10px 8px;">Status</th>
+                                    <th style="padding: 10px 20px 10px 8px;">Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.RecentProducts != null && ViewBag.RecentProducts.Count > 0)
+                                {
+                                    foreach (var product in ViewBag.RecentProducts)
+                                    {
+                                        <tr>
+                                            <td style="padding: 10px 8px 10px 20px;">
+                                                <strong style="color: #800000; font-size: 0.9rem;">@product.Name</strong>
+                                            </td>
+                                            <td style="padding: 10px 8px;">
+                                                <span class="badge" style="background: rgba(128, 0, 0, 0.1); color: #800000; font-size: 0.7rem; padding: 4px 12px;">
+                                                    <i class="fas fa-leaf me-1"></i> @product.Scent
+                                                </span>
+                                            </td>
+                                            <td style="padding: 10px 8px; color: #800000; font-weight: 600;">@product.Price.ToString("C")</td>
+                                            <td style="padding: 10px 8px;">
+                                                @if (product.StockQuantity <= 0)
+                                                {
+                                                    <span class="badge bg-danger" style="font-size: 0.7rem; padding: 3px 10px;">Out of Stock</span>
+                                                }
+                                                else if (product.StockQuantity < 10)
+                                                {
+                                                    <span class="badge bg-warning text-dark" style="font-size: 0.7rem; padding: 3px 10px;">@product.StockQuantity left</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge" style="background: #800000; color: white; font-size: 0.7rem; padding: 3px 10px;">@product.StockQuantity</span>
+                                                }
+                                            </td>
+                                            <td style="padding: 10px 8px;">
+                                                @if (product.IsActive)
+                                                {
+                                                    <span class="badge" style="background: #28a745; color: white; font-size: 0.7rem; padding: 3px 10px;">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary" style="font-size: 0.7rem; padding: 3px 10px;">Inactive</span>
+                                                }
+                                            </td>
+                                            <td style="padding: 10px 20px 10px 8px; font-size: 0.8rem; color: #6c757d;">@product.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">No products found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-end p-3">
+                        <a asp-action="Products" class="btn btn-sm" style="background: #800000; color: white; border: none; border-radius: 20px; padding: 6px 20px;">
+                            View All Products <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Timeline Styles */
+    .timeline {
+        position: relative;
+        padding-left: 10px;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 15px;
+        padding-left: 20px;
+    }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+    .timeline-icon {
+        position: absolute;
+        left: -8px;
+        top: 5px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 11px;
+        z-index: 1;
+    }
+
+    .timeline-content {
+        border-left: 3px solid #800000;
+        padding: 10px 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-left: 5px;
+    }
+
+    /* Statistics Box Styles */
+    .stat-box {
+        transition: all 0.3s ease;
+        cursor: default;
+    }
+
+        .stat-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+    /* Collapsible Section */
+    .collapsed-section {
+        display: none !important;
+    }
+
+    .card-header {
+        transition: all 0.3s ease;
+        user-select: none;
+    }
+
+        .card-header:hover {
+            opacity: 0.95;
+        }
+
+    /* Chevron Rotation */
+    .fa-chevron-down {
+        transition: transform 0.3s ease;
+    }
+
+        .fa-chevron-down.rotated {
+            transform: rotate(-90deg);
+        }
+
+    /* Card Animation */
+    .card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Table Hover */
+    .table-hover tbody tr:hover {
+        background: rgba(128, 0, 0, 0.03);
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .container-fluid {
+            padding: 0 12px !important;
+        }
+
+        .stat-box {
+            padding: 12px !important;
+        }
+
+            .stat-box h4 {
+                font-size: 1.1rem !important;
+            }
+
+        .table {
+            font-size: 0.75rem !important;
+        }
+
+        .btn {
+            font-size: 0.75rem !important;
+            padding: 4px 12px !important;
+        }
+
+        .card-header {
+            padding: 12px 16px !important;
+        }
+
+        .card-body {
+            padding: 12px !important;
+        }
+
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 10px;
+        }
+
+        .timeline-content {
+            padding: 8px 12px;
+        }
+
+        .timeline-item {
+            margin-bottom: 12px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .row > [class*="col-"] {
+            padding: 0 6px;
+        }
+
+        .stat-box h4 {
+            font-size: 1rem !important;
+        }
+
+        .stat-box small {
+            font-size: 0.65rem !important;
+        }
+
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 2px 8px !important;
+        }
+
+        .table td, .table th {
+            padding: 6px 4px !important;
+        }
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #800000;
+        border-radius: 10px;
+    }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a0000;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        // Store section states
+        function saveSectionState(sectionId, isCollapsed) {
+            localStorage.setItem(sectionId, isCollapsed);
+        }
+
+        function getSectionState(sectionId) {
+            const state = localStorage.getItem(sectionId);
+            return state === 'true';
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(sectionId + 'Icon');
+
+            if (section.classList.contains('collapsed-section')) {
+                section.classList.remove('collapsed-section');
+                if (icon) icon.classList.remove('rotated');
+                saveSectionState(sectionId, false);
+            } else {
+                section.classList.add('collapsed-section');
+                if (icon) icon.classList.add('rotated');
+                saveSectionState(sectionId, true);
+            }
+        }
+
+        function expandAllSections() {
+            const sections = ['quickActionsSection', 'recentActivitySection', 'statisticsSection', 'productsTableSection'];
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                const icon = document.getElementById(sectionId + 'Icon');
+                if (section && section.classList.contains('collapsed-section')) {
+                    section.classList.remove('collapsed-section');
+                    if (icon) icon.classList.remove('rotated');
+                    saveSectionState(sectionId, false);
+                }
+            });
+        }
+
+        function collapseAllSections() {
+            const sections = ['quickActionsSection', 'recentActivitySection', 'statisticsSection', 'productsTableSection'];
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                const icon = document.getElementById(sectionId + 'Icon');
+                if (section && !section.classList.contains('collapsed-section')) {
+                    section.classList.add('collapsed-section');
+                    if (icon) icon.classList.add('rotated');
+                    saveSectionState(sectionId, true);
+                }
+            });
+        }
+
+        // Load saved states
+        document.addEventListener('DOMContentLoaded', function () {
+            const sections = ['quickActionsSection', 'recentActivitySection', 'statisticsSection', 'productsTableSection'];
+            sections.forEach(sectionId => {
+                const isCollapsed = getSectionState(sectionId);
+                const section = document.getElementById(sectionId);
+                const icon = document.getElementById(sectionId + 'Icon');
+
+                if (isCollapsed && section) {
+                    section.classList.add('collapsed-section');
+                    if (icon) icon.classList.add('rotated');
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                expandAllSections();
+            } else if (e.ctrlKey && e.key === 'c') {
+                e.preventDefault();
+                collapseAllSections();
+            }
+        });
+    </script>
+}

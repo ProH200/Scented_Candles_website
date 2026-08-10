@@ -1,0 +1,518 @@
+﻿@model IEnumerable<ScentedCandleWebsite.Models.Product>
+
+@{
+    ViewData["Title"] = "Our Scented Candles";
+}
+
+<!-- Hero Section with Maroon Gradient -->
+
+
+<div class="container">
+    <!-- Filter and Sort Section -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="search-wrapper">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0" style="border-radius: 12px 0 0 12px;">
+                        <i class="fas fa-search" style="color: #800000;"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Search candles by name, scent, or description..." autocomplete="off" style="border-radius: 0 12px 12px 0;">
+                    <button class="btn btn-outline-secondary" type="button" id="clearSearch" style="display:none; border-radius: 0 12px 12px 0;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="searchStats" class="small mt-2" style="display:none; color: #6c757d;">
+                    <i class="fas fa-info-circle"></i> <span id="searchCount"></span> results found
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" style="border-radius: 50px; border-color: #800000; color: #800000;">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" id="scentFilter" style="border-radius: 12px;">
+                    <li>
+                        <a class="dropdown-item" href="#" onclick="filterByScent('all')" style="color: #4a0000;">
+                            <i class="fas fa-candle"></i> All Scents
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    @foreach (var scent in Model.Select(p => p.Scent).Distinct())
+                    {
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="filterByScent('@scent')" style="color: #4a0000;">
+                                <i class="fas fa-leaf"></i> @scent
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" style="border-radius: 50px; border-color: #800000; color: #800000;">
+                    <i class="fas fa-sort"></i> Sort
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" style="border-radius: 12px;">
+                    <li>
+                        <a class="dropdown-item" href="#" onclick="sortProducts('name')" style="color: #4a0000;">
+                            <i class="fas fa-sort-alpha-down"></i> Name A-Z
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#" onclick="sortProducts('priceLow')" style="color: #4a0000;">
+                            <i class="fas fa-arrow-up"></i> Price: Low to High
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#" onclick="sortProducts('priceHigh')" style="color: #4a0000;">
+                            <i class="fas fa-arrow-down"></i> Price: High to Low
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="row g-4" id="productsGrid">
+        @foreach (var product in Model)
+        {
+            <div class="col-lg-4 col-md-6 product-item"
+                 data-id="@product.Id"
+                 data-name="@product.Name.ToLower()"
+                 data-scent="@product.Scent"
+                 data-price="@product.Price"
+                 data-description="@product.Description.ToLower()"
+                 data-stock="@product.StockQuantity">
+                <div class="card h-100 product-card" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                    <!-- Image Section -->
+                    <div class="product-image-wrapper" style="position: relative; height: 280px; overflow: hidden; background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);">
+                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl" class="product-image" alt="@product.Name" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;">
+                        }
+                        else
+                        {
+                            <div class="product-image-placeholder" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #800000; background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);">
+                                <i class="fas fa-candle fa-5x mb-3"></i>
+                                <div class="flame-animation">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Stock Badge -->
+                        <div class="stock-badge" style="position: absolute; top: 15px; left: 15px; z-index: 2;">
+                            @if (product.StockQuantity <= 0)
+                            {
+                                <span class="badge bg-danger px-3 py-2" style="border-radius: 50px;">
+                                    <i class="fas fa-ban"></i> Out of Stock
+                                </span>
+                            }
+                            else if (product.StockQuantity < 10)
+                            {
+                                <span class="badge bg-warning text-dark px-3 py-2" style="border-radius: 50px;">
+                                    <i class="fas fa-exclamation-triangle"></i> Only @product.StockQuantity Left
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success px-3 py-2" style="border-radius: 50px;">
+                                    <i class="fas fa-check-circle"></i> In Stock
+                                </span>
+                            }
+                        </div>
+
+                        <!-- Quick View Button -->
+                        <button class="quick-view-btn" onclick="location.href='@Url.Action("Details", new { id = product.Id })'" style="position: absolute; bottom: -50px; left: 0; right: 0; margin: auto; width: 80%; background: #800000; color: white; border: none; padding: 10px; border-radius: 50px; transition: bottom 0.3s ease; cursor: pointer; font-size: 14px;">
+                            <i class="fas fa-eye"></i> Quick View
+                        </button>
+                    </div>
+
+                    <div class="card-body" style="padding: 1.25rem;">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0" style="font-size: 1.1rem; font-weight: 600; color: #2c3e50;">@product.Name</h5>
+                            <span class="scent-tag" style="background: #f8f9fa; padding: 4px 10px; border-radius: 50px; font-size: 0.75rem; color: #800000;">
+                                <i class="fas fa-leaf"></i> @product.Scent
+                            </span>
+                        </div>
+
+                        <div class="price-container" style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap;">
+                            <span class="current-price" style="font-size: 1.5rem; font-weight: 700; color: #800000;">@product.Price.ToString("C")</span>
+                            @if (product.StockQuantity > 0)
+                            {
+                                <span class="shipping-badge" style="background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 50px; font-size: 0.7rem; font-weight: 500;">
+                                    Free Shipping
+                                </span>
+                            }
+                        </div>
+
+                        <p class="card-text" style="color: #6c757d; font-size: 0.85rem; line-height: 1.4; margin-bottom: 1rem;">@(product.Description.Length > 100 ? product.Description.Substring(0, 100) + "..." : product.Description)</p>
+
+                        <!-- Product Specs -->
+                        <div class="product-specs" style="display: flex; gap: 15px; padding-top: 10px; border-top: 1px solid #f0f0f0;">
+                            <div class="spec-item" style="display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: #6c757d;">
+                                <i class="fas fa-clock" style="color: #800000;"></i>
+                                <span>40+ hrs</span>
+                            </div>
+                            <div class="spec-item" style="display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: #6c757d;">
+                                <i class="fas fa-weight-hanging" style="color: #800000;"></i>
+                                <span>220g</span>
+                            </div>
+                            <div class="spec-item" style="display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: #6c757d;">
+                                <i class="fas fa-seedling" style="color: #800000;"></i>
+                                <span>Soy Wax</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-0 pb-4" style="background: transparent;">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            if (product.StockQuantity > 0)
+                            {
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-add-to-cart" onclick="addToCart(@product.Id, this)" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; padding: 12px; border-radius: 50px; font-weight: 500; transition: all 0.3s ease;">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <span>Add to Cart</span>
+                                    </button>
+                                    <a asp-action="Details" asp-route-id="@product.Id" class="btn btn-outline-secondary" style="border-radius: 50px; padding: 10px; border-color: #800000; color: #800000;">
+                                        <i class="fas fa-info-circle"></i> View Details
+                                    </a>
+                                </div>
+                            }
+                            else
+                            {
+                                <button class="btn btn-out-of-stock w-100" disabled style="background: #e9ecef; color: #6c757d; border: none; padding: 12px; border-radius: 50px;">
+                                    <i class="fas fa-ban"></i> Out of Stock
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Account" asp-action="Login" class="btn btn-add-to-cart" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; padding: 12px; border-radius: 50px; font-weight: 500; transition: all 0.3s ease;">
+                                    <i class="fas fa-sign-in-alt"></i> Login to Purchase
+                                </a>
+                                <a asp-action="Details" asp-route-id="@product.Id" class="btn btn-outline-secondary" style="border-radius: 50px; padding: 10px; border-color: #800000; color: #800000;">
+                                    <i class="fas fa-info-circle"></i> View Details
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Empty State -->
+    @if (!Model.Any())
+    {
+        <div class="empty-state" style="text-align: center; padding: 80px 20px; background: #f8f9fa; border-radius: 20px;">
+            <i class="fas fa-candle" style="font-size: 4rem; color: #800000; margin-bottom: 1rem;"></i>
+            <h3 style="color: #4a0000;">No candles available at the moment</h3>
+            <p style="color: #6c757d;">Check back soon for new scents!</p>
+        </div>
+    }
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="border-radius: 12px; overflow: hidden;">
+        <div class="toast-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white;">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong class="me-auto">Success!</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage" style="background: white; color: #4a0000;">
+            Item added to cart!
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Hero Section */
+    .hero-section {
+        border-radius: 0 0 50px 50px;
+        margin-bottom: 3rem;
+    }
+
+    .floating-candle {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-15px);
+        }
+    }
+
+    .feature-badge {
+        transition: all 0.3s ease;
+    }
+
+        .feature-badge:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.3) !important;
+        }
+
+    /* Search Wrapper */
+    .search-wrapper .input-group-text {
+        border: 1px solid #dee2e6;
+        border-right: none;
+    }
+
+    .search-wrapper input {
+        border: 1px solid #dee2e6;
+        border-left: none;
+        box-shadow: none;
+    }
+
+        .search-wrapper input:focus {
+            border-color: #800000;
+            box-shadow: none;
+        }
+
+    /* Product Cards */
+    .product-card {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(128, 0, 0, 0.1) !important;
+        }
+
+            .product-card:hover .product-image {
+                transform: scale(1.08);
+            }
+
+    .product-image-wrapper:hover .quick-view-btn {
+        bottom: 20px;
+    }
+
+    .quick-view-btn:hover {
+        background: #5a0000 !important;
+    }
+
+    .flame-animation {
+        animation: flicker 1s ease-in-out infinite;
+    }
+
+    @@keyframes flicker {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.7;
+            transform: scale(1.1);
+        }
+    }
+
+    /* Button Hover Effects */
+    .btn-add-to-cart:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(128, 0, 0, 0.4);
+    }
+
+    .btn-outline-secondary:hover {
+        background: #800000;
+        border-color: #800000;
+        color: white;
+    }
+
+    /* Animation */
+    .product-item {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+
+        .feature-badge {
+            font-size: 12px;
+            padding: 5px 12px;
+        }
+
+        .product-image-wrapper {
+            height: 220px;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const searchStats = document.getElementById('searchStats');
+        const searchCount = document.getElementById('searchCount');
+
+        let debounceTimer;
+
+        // Real-time search
+        searchInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                performSearch();
+            }, 300);
+        });
+
+        clearSearchBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            performSearch();
+            searchInput.focus();
+        });
+
+        function performSearch() {
+            let searchTerm = searchInput.value.toLowerCase().trim();
+            let products = document.querySelectorAll('.product-item');
+            let visibleCount = 0;
+
+            if (searchTerm === '') {
+                products.forEach(product => product.style.display = '');
+                clearSearchBtn.style.display = 'none';
+                searchStats.style.display = 'none';
+                return;
+            }
+
+            clearSearchBtn.style.display = 'block';
+
+            products.forEach(product => {
+                let name = product.dataset.name;
+                let scent = product.dataset.scent;
+                let description = product.dataset.description;
+
+                if (name.includes(searchTerm) || scent.includes(searchTerm) || description.includes(searchTerm)) {
+                    product.style.display = '';
+                    visibleCount++;
+                } else {
+                    product.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                searchCount.innerHTML = 'No';
+                searchStats.style.display = 'block';
+                searchStats.classList.add('text-danger');
+            } else {
+                searchCount.innerHTML = visibleCount;
+                searchStats.style.display = 'block';
+                searchStats.classList.remove('text-danger');
+            }
+        }
+
+        function filterByScent(scent) {
+            let products = document.querySelectorAll('.product-item');
+            products.forEach(product => {
+                if (scent === 'all' || product.dataset.scent === scent) {
+                    product.style.display = '';
+                } else {
+                    product.style.display = 'none';
+                }
+            });
+
+            if (searchInput.value !== '') {
+                searchInput.value = '';
+                clearSearchBtn.style.display = 'none';
+                searchStats.style.display = 'none';
+            }
+        }
+
+        function sortProducts(criteria) {
+            let grid = document.getElementById('productsGrid');
+            let products = Array.from(document.querySelectorAll('.product-item'));
+
+            products.sort((a, b) => {
+                if (criteria === 'name') {
+                    return a.dataset.name.localeCompare(b.dataset.name);
+                } else if (criteria === 'priceLow') {
+                    return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                } else if (criteria === 'priceHigh') {
+                    return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                }
+                return 0;
+            });
+
+            products.forEach(product => grid.appendChild(product));
+            performSearch();
+        }
+
+        // Add to Cart Function with AJAX
+        function addToCart(productId, buttonElement) {
+            const originalHtml = buttonElement.innerHTML;
+            buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+            buttonElement.disabled = true;
+
+            $.ajax({
+                url: '@Url.Action("AddToCart", "Cart")',
+                type: 'POST',
+                data: {
+                    productId: productId,
+                    quantity: 1,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    if (response.success) {
+                        const toast = new bootstrap.Toast(document.getElementById('cartToast'));
+                        document.getElementById('toastMessage').innerHTML = response.message;
+                        toast.show();
+                        updateCartCount(response.cartCount);
+                        buttonElement.innerHTML = '<i class="fas fa-check"></i> Added!';
+                        setTimeout(() => {
+                            buttonElement.innerHTML = originalHtml;
+                            buttonElement.disabled = false;
+                        }, 2000);
+                    } else {
+                        buttonElement.innerHTML = originalHtml;
+                        buttonElement.disabled = false;
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    buttonElement.innerHTML = originalHtml;
+                    buttonElement.disabled = false;
+                    alert('Error adding to cart. Please try again.');
+                }
+            });
+        }
+
+        function updateCartCount(count) {
+            const cartBadge = document.getElementById('cartCountBadge');
+            if (cartBadge) {
+                if (count > 0) {
+                    cartBadge.textContent = count;
+                    cartBadge.style.display = 'inline-block';
+                } else {
+                    cartBadge.style.display = 'none';
+                }
+            }
+        }
+
+        // Auto-hide alerts
+        setTimeout(() => {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+}

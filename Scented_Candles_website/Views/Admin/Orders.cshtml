@@ -1,0 +1,552 @@
+﻿@model IEnumerable<Order>
+
+@{
+    ViewData["Title"] = "Manage Orders";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0" style="color: #4a0000;">
+            <i class="fas fa-shopping-cart" style="color: #800000;"></i> Manage Orders
+        </h1>
+        <span class="badge px-3 py-2" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); font-size: 0.9rem;">
+            @Model.Count() Total Orders
+        </span>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; border-left: 4px solid #800000;">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-uppercase mb-1" style="color: #800000; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;">
+                                Pending Orders
+                            </div>
+                            <div class="h4 mb-0 fw-bold" style="color: #2c1810;">
+                                @Model.Count(o => o.Status == "Pending")
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(128, 0, 0, 0.1);">
+                                <i class="fas fa-clock" style="color: #800000; font-size: 20px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; border-left: 4px solid #ffc107;">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-uppercase mb-1" style="color: #ffc107; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;">
+                                Processing
+                            </div>
+                            <div class="h4 mb-0 fw-bold" style="color: #2c1810;">
+                                @Model.Count(o => o.Status == "Processing")
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(255, 193, 7, 0.1);">
+                                <i class="fas fa-spinner" style="color: #ffc107; font-size: 20px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; border-left: 4px solid #28a745;">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-uppercase mb-1" style="color: #28a745; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;">
+                                Delivered
+                            </div>
+                            <div class="h4 mb-0 fw-bold" style="color: #2c1810;">
+                                @Model.Count(o => o.Status == "Delivered")
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(40, 167, 69, 0.1);">
+                                <i class="fas fa-check-circle" style="color: #28a745; font-size: 20px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; border-left: 4px solid #dc3545;">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-uppercase mb-1" style="color: #dc3545; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;">
+                                Cancelled
+                            </div>
+                            <div class="h4 mb-0 fw-bold" style="color: #2c1810;">
+                                @Model.Count(o => o.Status == "Cancelled")
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(220, 53, 69, 0.1);">
+                                <i class="fas fa-ban" style="color: #dc3545; font-size: 20px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden;">
+        <div class="card-header py-3" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none;">
+            <h6 class="m-0 fw-bold">
+                <i class="fas fa-shopping-cart me-2"></i> All Orders
+            </h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="table table-hover mb-0" id="ordersTable" width="100%" cellspacing="0" style="min-width: 800px;">
+                    <thead style="background: #f8f9fa;">
+                        <tr style="color: #4a0000;">
+                            <th style="padding: 12px 8px 12px 20px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Order ID</th>
+                            <th style="padding: 12px 8px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Customer</th>
+                            <th style="padding: 12px 8px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Date</th>
+                            <th style="padding: 12px 8px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Items</th>
+                            <th style="padding: 12px 8px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Total</th>
+                            <th style="padding: 12px 8px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Status</th>
+                            <th style="padding: 12px 20px 12px 8px; white-space: nowrap; font-weight: 600; font-size: 0.85rem; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.OrderByDescending(o => o.OrderDate))
+                        {
+                            <tr>
+                                <td style="padding: 12px 8px 12px 20px; vertical-align: middle;">
+                                    <span class="fw-bold" style="color: #800000; font-size: 0.9rem;">#@order.Id</span>
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle;">
+                                    <div style="font-weight: 600; color: #2c1810; font-size: 0.85rem;">@order.User?.FirstName @order.User?.LastName</div>
+                                    <small class="text-muted" style="font-size: 0.75rem;">@order.User?.Email</small>
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle; font-size: 0.85rem; color: #7d6b5e;">
+                                    @order.OrderDate.ToString("MMM dd, yyyy")
+                                    <br />
+                                    <small style="font-size: 0.7rem;">@order.OrderDate.ToString("hh:mm tt")</small>
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle;">
+                                    <span class="badge" style="background: rgba(128, 0, 0, 0.1); color: #800000; font-size: 0.75rem; padding: 4px 12px;">
+                                        @order.OrderItems.Count items
+                                    </span>
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle;">
+                                    <span class="fw-bold" style="color: #800000; font-size: 0.95rem;">@order.TotalAmount.ToString("C")</span>
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle;">
+                                    <select class="form-select form-select-sm status-select" data-order-id="@order.Id" onchange="updateOrderStatus(@order.Id, this.value)" style="border-color: #800000; border-radius: 20px; width: 130px; font-size: 0.75rem; padding: 4px 12px;">
+                                        <option value="Pending" selected="@(order.Status == "Pending")">📋 Pending</option>
+                                        <option value="Processing" selected="@(order.Status == "Processing")">⚙️ Processing</option>
+                                        <option value="Shipped" selected="@(order.Status == "Shipped")">🚚 Shipped</option>
+                                        <option value="Delivered" selected="@(order.Status == "Delivered")">✅ Delivered</option>
+                                        <option value="Cancelled" selected="@(order.Status == "Cancelled")">❌ Cancelled</option>
+                                    </select>
+                                </td>
+                                <td style="padding: 12px 20px 12px 8px; vertical-align: middle; text-align: center;">
+                                    <button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#orderModal-@order.Id" style="background: #800000; color: white; border: none; border-radius: 8px; padding: 5px 14px; font-size: 0.75rem;">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Order Details Modal -->
+                            <div class="modal fade" id="orderModal-@order.Id" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg modal-dialog-centered">
+                                    <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+                                        <div class="modal-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; padding: 16px 24px;">
+                                            <h5 class="modal-title">
+                                                <i class="fas fa-receipt me-2"></i> Order #@order.Id Details
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="row g-3 mb-4">
+                                                <div class="col-md-6">
+                                                    <div class="info-card" style="background: #f8f9fa; padding: 15px; border-radius: 12px; height: 100%;">
+                                                        <h6 style="color: #800000; margin-bottom: 10px; font-weight: 700; font-size: 0.85rem;">
+                                                            <i class="fas fa-user me-2"></i>Customer Information
+                                                        </h6>
+                                                        <p class="mb-1" style="font-size: 0.85rem;"><strong>Name:</strong> @order.User?.FirstName @order.User?.LastName</p>
+                                                        <p class="mb-1" style="font-size: 0.85rem;"><strong>Email:</strong> @order.User?.Email</p>
+                                                        <p class="mb-0" style="font-size: 0.85rem;"><strong>Phone:</strong> @order.PhoneNumber</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="info-card" style="background: #f8f9fa; padding: 15px; border-radius: 12px; height: 100%;">
+                                                        <h6 style="color: #800000; margin-bottom: 10px; font-weight: 700; font-size: 0.85rem;">
+                                                            <i class="fas fa-truck me-2"></i>Shipping Address
+                                                        </h6>
+                                                        <p class="mb-1" style="font-size: 0.85rem;">@order.ShippingAddress</p>
+                                                        <p class="mb-1" style="font-size: 0.85rem;">@order.City, @order.PostalCode</p>
+                                                        <p class="mb-0" style="font-size: 0.85rem;">@order.Country</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h6 style="color: #800000; margin-bottom: 12px; font-weight: 700; font-size: 0.9rem;">
+                                                <i class="fas fa-box me-2"></i>Order Items
+                                            </h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm" style="border-radius: 12px; overflow: hidden; font-size: 0.85rem;">
+                                                    <thead style="background: #800000; color: white;">
+                                                        <tr>
+                                                            <th style="padding: 10px 15px;">Product</th>
+                                                            <th style="padding: 10px 15px;">Quantity</th>
+                                                            <th style="padding: 10px 15px;">Price</th>
+                                                            <th style="padding: 10px 15px;">Subtotal</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var item in order.OrderItems)
+                                                        {
+                                                            <tr>
+                                                                <td style="padding: 10px 15px;">@item.Product?.Name</td>
+                                                                <td style="padding: 10px 15px;">@item.Quantity</td>
+                                                                <td style="padding: 10px 15px;">@item.Price.ToString("C")</td>
+                                                                <td style="padding: 10px 15px; font-weight: 600; color: #800000;">@((item.Quantity * item.Price).ToString("C"))</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                    <tfoot style="background: #f8f9fa; font-weight: 700;">
+                                                        <tr>
+                                                            <th colspan="3" class="text-end" style="padding: 10px 15px;">Total:</th>
+                                                            <th style="padding: 10px 15px; color: #800000; font-size: 1.1rem;">@order.TotalAmount.ToString("C")</th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                            <div class="alert mt-3" style="background: rgba(128, 0, 0, 0.05); border: none; border-left: 3px solid #800000; border-radius: 12px; padding: 12px 16px; font-size: 0.85rem;">
+                                                <i class="fas fa-calendar me-2" style="color: #800000;"></i>
+                                                Order placed on @order.OrderDate.ToString("MMMM dd, yyyy hh:mm tt")
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer" style="border-top: none; padding: 16px 24px;">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 8px 24px;">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Table Styling */
+    .table {
+        vertical-align: middle;
+        font-size: 0.85rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background: rgba(128, 0, 0, 0.02);
+        transition: all 0.3s ease;
+    }
+
+    /* Status Select Styling */
+    .status-select {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: white;
+    }
+
+        .status-select:hover {
+            border-color: #800000;
+            box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.15);
+        }
+
+        .status-select:focus {
+            border-color: #800000;
+            box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
+        }
+
+    /* Button Hover Effects */
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    /* Card Animation */
+    .card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Statistics Card Hover */
+    .card {
+        transition: all 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(128, 0, 0, 0.08) !important;
+        }
+
+    /* Modal Animation */
+    .modal-content {
+        animation: modalFadeIn 0.3s ease-out;
+    }
+
+    @@keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* DataTables Styling */
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        padding: 15px 20px;
+    }
+
+        .dataTables_wrapper .dataTables_length select {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 4px 8px;
+            margin: 0 5px;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            border-radius: 50px;
+            border: 1px solid #dee2e6;
+            padding: 6px 15px;
+            margin-left: 8px;
+            font-size: 0.85rem;
+        }
+
+            .dataTables_wrapper .dataTables_filter input:focus {
+                border-color: #800000;
+                box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
+                outline: none;
+            }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: linear-gradient(135deg, #800000 0%, #5a0000 100%);
+        color: white !important;
+        border: none;
+        border-radius: 8px;
+        padding: 4px 12px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #5a0000;
+        color: white !important;
+        border: none;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        padding: 15px 20px;
+        font-size: 0.85rem;
+        color: #7d6b5e;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        padding: 15px 20px;
+    }
+
+    .dataTables_wrapper .dataTables_empty {
+        padding: 30px !important;
+        text-align: center !important;
+        color: #7d6b5e !important;
+    }
+
+    /* Scrollbar Styling */
+    .table-responsive::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #800000;
+        border-radius: 10px;
+    }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #5a0000;
+        }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 992px) {
+        .table-responsive {
+            font-size: 0.8rem;
+        }
+
+        .status-select {
+            width: 110px !important;
+            font-size: 0.7rem !important;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .container-fluid {
+            padding: 0 12px !important;
+        }
+
+        .table-responsive {
+            font-size: 0.75rem;
+        }
+
+        .btn-sm {
+            padding: 3px 10px !important;
+            font-size: 0.7rem !important;
+        }
+
+        .status-select {
+            width: 100px !important;
+            font-size: 0.65rem !important;
+        }
+
+        .row.g-3 {
+            gap: 12px !important;
+        }
+
+        .modal-body {
+            padding: 16px !important;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .table-responsive {
+            font-size: 0.7rem;
+        }
+
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 2px 8px !important;
+        }
+
+        td, th {
+            padding: 6px 4px !important;
+        }
+    }
+</style>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        function updateOrderStatus(orderId, status) {
+            if (confirm('Are you sure you want to change the order status to ' + status + '?')) {
+                const select = event.target;
+                const originalValue = select.value;
+                select.disabled = true;
+
+                $.ajax({
+                    url: '@Url.Action("UpdateOrderStatus", "Admin")',
+                    type: 'POST',
+                    data: {
+                        orderId: orderId,
+                        status: status,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            showNotification('Order status updated successfully!', 'success');
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            alert('Error updating order status');
+                            select.value = originalValue;
+                            select.disabled = false;
+                        }
+                    },
+                    error: function () {
+                        alert('Error updating order status');
+                        select.value = originalValue;
+                        select.disabled = false;
+                    }
+                });
+            } else {
+                const select = event.target;
+                const originalStatus = '@@order.Status';
+                select.value = originalStatus;
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = $(`
+                        <div class="alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index: 9999; min-width: 300px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); border-radius: 12px;">
+                            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                            ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `);
+            $('body').append(notification);
+            setTimeout(() => notification.fadeOut('slow', () => notification.remove()), 3000);
+        }
+
+        $(document).ready(function () {
+            $('#ordersTable').DataTable({
+                "order": [[2, "desc"]],
+                "pageLength": 10,
+                "responsive": true,
+                "language": {
+                    "search": "🔍 Search orders:",
+                    "lengthMenu": "Show _MENU_ orders per page",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ orders",
+                    "infoEmpty": "No orders found",
+                    "emptyTable": "No orders available",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "→",
+                        "previous": "←"
+                    }
+                },
+                "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                    '<"row"<"col-sm-12"tr>>' +
+                    '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
+            });
+        });
+    </script>
+}

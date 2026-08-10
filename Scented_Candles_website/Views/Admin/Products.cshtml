@@ -1,0 +1,421 @@
+﻿@model IEnumerable<ScentedCandleWebsite.Models.Product>
+
+@{
+    ViewData["Title"] = "Manage Products";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0" style="color: #4a0000;">
+            <i class="fas fa-candle" style="color: #800000;"></i> Manage Products
+        </h1>
+        <a asp-action="CreateProduct" class="btn" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; border-radius: 12px; padding: 10px 24px;">
+            <i class="fas fa-plus me-2"></i> Add New Candle
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 rounded-3 shadow-sm" role="alert" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); color: #155724; border-left: 4px solid #28a745;">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Products Table -->
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 20px; overflow: hidden;">
+        <div class="card-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; padding: 16px 24px;">
+            <h6 class="m-0 fw-bold">
+                <i class="fas fa-candle me-2"></i> All Candles
+            </h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="table table-hover mb-0" id="productsTable" width="100%" cellspacing="0" style="min-width: 800px;">
+                    <thead style="background: #f8f9fa;">
+                        <tr style="color: #4a0000;">
+                            <th style="padding: 12px 8px 12px 20px; white-space: nowrap;">ID</th>
+                            <th style="padding: 12px 8px; white-space: nowrap;">Image</th>
+                            <th style="padding: 12px 8px; white-space: nowrap;">Name</th>
+                            <th style="padding: 12px 8px; white-space: nowrap;">Scent</th>
+                            <th style="padding: 12px 8px; white-space: nowrap;">Price</th>
+                            <th style="padding: 12px 8px; white-space: nowrap;">Stock</th>
+                            <th style="padding: 12px 8px; white-space: nowrap;">Status</th>
+                            <th style="padding: 12px 8px; white-space: nowrap;">Role</th>
+                            <th style="padding: 12px 20px 12px 8px; white-space: nowrap;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in Model.OrderByDescending(p => p.CreatedAt))
+                        {
+                            <tr>
+                                <td style="padding: 12px 8px 12px 20px; vertical-align: middle;">
+                                    <span class="fw-semibold" style="color: #4a0000;">@product.Id</span>
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle; text-align: center;">
+                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                    {
+                                        <img src="@product.ImageUrl" alt="@product.Name" style="width: 45px; height: 45px; object-fit: cover; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                    }
+                                    else
+                                    {
+                                        <div class="d-inline-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: #f8f9fa; border-radius: 10px;">
+                                            <i class="fas fa-candle" style="color: #800000; font-size: 20px;"></i>
+                                        </div>
+                                    }
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle;">
+                                    <strong style="color: #4a0000; font-size: 0.9rem;">@product.Name</strong>
+                                    <br />
+                                    <small class="text-muted" style="font-size: 0.75rem;">@(product.Description?.Length > 40 ? product.Description.Substring(0, 40) + "..." : product.Description)</small>
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle;">
+                                    <span class="badge" style="background: rgba(128, 0, 0, 0.1); color: #800000; font-size: 0.75rem; padding: 4px 12px;">
+                                        <i class="fas fa-leaf me-1"></i> @product.Scent
+                                    </span>
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle;">
+                                    <span class="fw-bold" style="color: #800000; font-size: 0.95rem;">@product.Price.ToString("C")</span>
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle;">
+                                    @if (product.StockQuantity <= 0)
+                                    {
+                                        <span class="badge bg-danger px-2 py-1" style="font-size: 0.7rem;">Out of Stock</span>
+                                    }
+                                    else if (product.StockQuantity < 10)
+                                    {
+                                        <span class="badge bg-warning text-dark px-2 py-1" style="font-size: 0.7rem;">@product.StockQuantity left</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success px-2 py-1" style="font-size: 0.7rem;">@product.StockQuantity</span>
+                                    }
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle;">
+                                    @if (product.IsActive)
+                                    {
+                                        <span class="badge bg-success" style="font-size: 0.7rem; padding: 4px 10px;">
+                                            <i class="fas fa-check-circle me-1"></i> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary" style="font-size: 0.7rem; padding: 4px 10px;">
+                                            <i class="fas fa-ban me-1"></i> Inactive
+                                        </span>
+                                    }
+                                </td>
+                                <td style="padding: 12px 8px; vertical-align: middle;">
+                                    @if (product.RequiredRole == "Admin")
+                                    {
+                                        <span class="badge" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); font-size: 0.7rem; padding: 4px 10px;">
+                                            <i class="fas fa-user-shield me-1"></i> Admin
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info" style="font-size: 0.7rem; padding: 4px 10px;">
+                                            <i class="fas fa-users me-1"></i> Everyone
+                                        </span>
+                                    }
+                                </td>
+                                <td style="padding: 12px 20px 12px 8px; vertical-align: middle;">
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <a asp-action="EditProduct" asp-route-id="@product.Id" class="btn btn-sm" style="background: #800000; color: white; border: none; border-radius: 8px; padding: 4px 12px; font-size: 0.75rem;">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@product.Id" style="border-radius: 8px; padding: 4px 12px; font-size: 0.75rem;">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+
+                                    <!-- Delete Modal -->
+                                    <div class="modal fade" id="deleteModal-@product.Id" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+                                                <div class="modal-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; padding: 16px 24px;">
+                                                    <h5 class="modal-title">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i> Delete Product
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body text-center p-4">
+                                                    <div class="mb-3">
+                                                        <i class="fas fa-candle fa-4x" style="color: #800000;"></i>
+                                                    </div>
+                                                    <h5 style="color: #4a0000;">Are you sure you want to delete this product?</h5>
+                                                    <div class="alert alert-warning mt-3 text-start" style="border-radius: 12px; font-size: 0.9rem;">
+                                                        <strong>Product Details:</strong><br />
+                                                        <strong>Name:</strong> @product.Name<br />
+                                                        <strong>Price:</strong> @product.Price.ToString("C")<br />
+                                                        <strong>Stock:</strong> @product.StockQuantity<br />
+                                                        <strong>Scent:</strong> @product.Scent
+                                                    </div>
+                                                    <p class="text-danger mt-2 small">
+                                                        <i class="fas fa-info-circle"></i> This action cannot be undone!
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer" style="border-top: none; padding: 16px 24px;">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 8px 24px;">Cancel</button>
+                                                    <form asp-action="DeleteProduct" method="post" style="display: inline;">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@product.Id" />
+                                                        <button type="submit" class="btn" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; border-radius: 10px; padding: 8px 24px;">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Table Styling */
+    .table {
+        vertical-align: middle;
+        font-size: 0.85rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background: rgba(128, 0, 0, 0.03);
+        transition: all 0.3s ease;
+    }
+
+    /* Button Hover Effects */
+    .btn:hover {
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Card Animation */
+    .card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Badge Styling */
+    .badge {
+        padding: 4px 10px;
+        font-weight: 500;
+        border-radius: 20px;
+    }
+
+        .badge i {
+            margin-right: 4px;
+        }
+
+    /* Modal Animation */
+    .modal-content {
+        animation: modalFadeIn 0.3s ease-out;
+    }
+
+    @@keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Alert Animation */
+    .alert {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @@keyframes slideDown {
+        from {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* DataTables Styling */
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        padding: 15px 20px;
+    }
+
+        .dataTables_wrapper .dataTables_filter input {
+            border-radius: 50px;
+            border: 1px solid #dee2e6;
+            padding: 6px 15px;
+            margin-left: 8px;
+            font-size: 0.85rem;
+        }
+
+            .dataTables_wrapper .dataTables_filter input:focus {
+                border-color: #800000;
+                box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
+                outline: none;
+            }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: linear-gradient(135deg, #800000 0%, #5a0000 100%);
+        color: white !important;
+        border: none;
+        border-radius: 8px;
+        padding: 4px 12px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #5a0000;
+        color: white !important;
+        border: none;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        padding: 15px 20px;
+        font-size: 0.85rem;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        padding: 15px 20px;
+    }
+
+    /* Scrollbar Styling */
+    .table-responsive::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #800000;
+        border-radius: 10px;
+    }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #5a0000;
+        }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 1200px) {
+        .table {
+            font-size: 0.8rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .container-fluid {
+            padding: 0 12px !important;
+        }
+
+        .d-flex {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 12px;
+        }
+
+        .table {
+            font-size: 0.75rem;
+        }
+
+        .btn {
+            font-size: 0.7rem !important;
+            padding: 4px 10px !important;
+        }
+
+        .badge {
+            font-size: 0.65rem !important;
+            padding: 3px 8px !important;
+        }
+
+        img {
+            width: 35px !important;
+            height: 35px !important;
+        }
+
+        td, th {
+            padding: 8px 6px !important;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .table-responsive {
+            font-size: 0.7rem;
+        }
+
+        .btn-sm {
+            padding: 2px 8px !important;
+            font-size: 0.65rem !important;
+        }
+
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 2px 6px !important;
+        }
+
+        .modal-body {
+            padding: 16px !important;
+        }
+    }
+</style>
+
+@section Scripts {
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#productsTable').DataTable({
+                "order": [[0, "desc"]],
+                "pageLength": 10,
+                "responsive": true,
+                "language": {
+                    "search": "🔍 Search:",
+                    "lengthMenu": "Show _MENU_ per page",
+                    "info": "Showing _START_ to _END_ of _TOTAL_",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "→",
+                        "previous": "←"
+                    }
+                },
+                "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                    '<"row"<"col-sm-12"tr>>' +
+                    '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
+            });
+        });
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function () {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+}

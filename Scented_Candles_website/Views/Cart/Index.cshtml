@@ -1,0 +1,338 @@
+﻿@model List<CartItem>
+
+@{
+    ViewData["Title"] = "Shopping Cart";
+    var subtotal = ViewBag.Subtotal;
+    var shipping = ViewBag.Shipping;
+    var total = ViewBag.Total;
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4" style="color: #4a0000;">
+        <i class="fas fa-shopping-cart" style="color: #800000;"></i> Shopping Cart
+        @if (Model.Any())
+        {
+            <span class="badge" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%);">@ViewBag.CartCount items</span>
+        }
+    </h1>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5" style="background: #f8f9fa; border-radius: 20px;">
+            <i class="fas fa-shopping-cart fa-5x mb-3" style="color: #800000;"></i>
+            <h3 style="color: #4a0000;">Your cart is empty</h3>
+            <p class="text-muted">Looks like you haven't added any candles to your cart yet.</p>
+            <a asp-controller="Product" asp-action="Index" class="btn btn-lg" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; border-radius: 50px; padding: 12px 30px;">
+                <i class="fas fa-candle me-2"></i> Browse Candles
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden;">
+                    <div class="card-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none;">
+                        <h5 class="mb-0">
+                            <i class="fas fa-shopping-cart me-2"></i> Cart Items (@ViewBag.CartCount)
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: #f8f9fa;">
+                                    <tr style="color: #4a0000;">
+                                        <th class="ps-4">Product</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Subtotal</th>
+                                        <th class="pe-4"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr id="cart-item-@item.Id" style="border-bottom: 1px solid #f0f0f0;">
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
+                                                    {
+                                                        <img src="@item.Product.ImageUrl" alt="@item.Product.Name" style="width: 70px; height: 70px; object-fit: cover; border-radius: 12px;" class="me-3">
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="bg-light me-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; border-radius: 12px;">
+                                                            <i class="fas fa-candle fa-2x" style="color: #800000;"></i>
+                                                        </div>
+                                                    }
+                                                    <div>
+                                                        <h6 class="mb-0 fw-semibold" style="color: #4a0000;">@item.Product?.Name</h6>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-leaf me-1" style="color: #800000;"></i>@item.Product?.Scent
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="fw-semibold" style="color: #800000;">@item.Product?.Price.ToString("C")</td>
+                                            <td style="width: 130px;">
+                                                <div class="input-group">
+                                                    <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity(@item.Id, @(item.Quantity - 1))" style="border-color: #800000; color: #800000;">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" id="qty-@item.Id" value="@item.Quantity" class="form-control form-control-sm text-center" min="1" max="@item.Product?.StockQuantity" style="width: 50px; border-color: #800000;" onchange="updateQuantity(@item.Id, this.value)">
+                                                    <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity(@item.Id, @(item.Quantity + 1))" style="border-color: #800000; color: #800000;">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="fw-bold" id="subtotal-@item.Id" style="color: #800000;">
+                                                @((item.Quantity * (item.Product?.Price ?? 0)).ToString("C"))
+                                            </td>
+                                            <td class="pe-4">
+                                                <button class="btn btn-sm" onclick="removeItem(@item.Id)" style="background: #dc3545; color: white; border-radius: 10px;">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden; position: sticky; top: 20px;">
+                    <div class="card-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none;">
+                        <h5 class="mb-0">
+                            <i class="fas fa-receipt me-2"></i> Order Summary
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Cart Items Summary -->
+                        <div class="summary-items mb-3" style="max-height: 200px; overflow-y: auto;">
+                            @foreach (var item in Model)
+                            {
+                                <div class="d-flex justify-content-between mb-2 pb-2" style="border-bottom: 1px solid #f0f0f0;">
+                                    <span style="color: #4a0000;">@item.Product?.Name x @item.Quantity</span>
+                                    <span style="color: #800000;">@((item.Quantity * (item.Product?.Price ?? 0)).ToString("C"))</span>
+                                </div>
+                            }
+                        </div>
+
+                        <hr class="my-3" style="border-color: #f0f0f0;">
+
+                        <!-- Totals -->
+                        <div class="totals">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span style="color: #4a0000;">Subtotal</span>
+                                <span id="subtotalDisplay" style="color: #800000;">@subtotal.ToString("C")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span style="color: #4a0000;">Shipping</span>
+                                <span id="shippingDisplay" style="color: #800000;">@shipping.ToString("C")</span>
+                            </div>
+                            <hr class="my-2" style="border-color: #f0f0f0;">
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong style="color: #4a0000;">Total</strong>
+                                <strong id="totalDisplay" style="color: #800000; font-size: 1.3rem;">@total.ToString("C")</strong>
+                            </div>
+                        </div>
+
+                        <!-- Free Shipping Info -->
+                        @if (subtotal < 100)
+                        {
+                            <div class="alert alert-info small mt-3" style="background: rgba(128, 0, 0, 0.05); border: none; border-left: 3px solid #800000; border-radius: 12px;">
+                                <i class="fas fa-truck me-2" style="color: #800000;"></i>
+                                Add <strong>@((100 - subtotal).ToString("C"))</strong> more to get free shipping!
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success small mt-3" style="background: rgba(40, 167, 69, 0.1); border: none; border-left: 3px solid #28a745; border-radius: 12px;">
+                                <i class="fas fa-truck me-2" style="color: #28a745;"></i>
+                                You qualify for <strong>FREE SHIPPING!</strong>
+                            </div>
+                        }
+
+                        <!-- Checkout Buttons -->
+                        <a asp-action="Checkout" class="btn btn-lg w-100 mt-3" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; border-radius: 50px; padding: 14px; font-weight: 600; transition: all 0.3s ease;">
+                            <i class="fas fa-credit-card me-2"></i> Proceed to Checkout
+                        </a>
+                        <a asp-controller="Product" asp-action="Index" class="btn btn-outline-secondary w-100 mt-2" style="border-radius: 50px; padding: 12px; border-color: #800000; color: #800000;">
+                            <i class="fas fa-candle me-2"></i> Continue Shopping
+                        </a>
+
+                        <!-- Secure Payment Info -->
+                        <div class="text-center mt-4 pt-2">
+                            <p class="small text-muted mb-2">
+                                <i class="fas fa-lock me-1" style="color: #800000;"></i> Secure Checkout
+                            </p>
+                            <div>
+                                <i class="fab fa-cc-visa fa-2x me-2" style="color: #1a1f71;"></i>
+                                <i class="fab fa-cc-mastercard fa-2x me-2" style="color: #eb001b;"></i>
+                                <i class="fab fa-cc-amex fa-2x me-2" style="color: #006fcf;"></i>
+                                <i class="fab fa-cc-paypal fa-2x" style="color: #003087;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    /* Quantity Input Styling */
+    .input-group .btn:hover {
+        background: #800000;
+        border-color: #800000;
+        color: white;
+    }
+
+    .input-group input:focus {
+        border-color: #800000;
+        box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
+    }
+
+    /* Table Row Hover */
+    .table-hover tbody tr:hover {
+        background: rgba(128, 0, 0, 0.03);
+    }
+
+    /* Summary Items Scrollbar */
+    .summary-items::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .summary-items::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .summary-items::-webkit-scrollbar-thumb {
+        background: #800000;
+        border-radius: 10px;
+    }
+
+    /* Button Hover Effects */
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(128, 0, 0, 0.3);
+    }
+
+    /* Sticky Order Summary */
+    @@media (min-width: 992px) {
+        .col-lg-4 .card {
+            position: sticky;
+            top: 20px;
+        }
+    }
+
+    /* Card Animation */
+    .card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 768px) {
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        .table-responsive {
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            padding: 10px;
+        }
+    }
+
+    /* Remove number input arrows */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        opacity: 0.5;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function updateQuantity(cartItemId, newQuantity) {
+            newQuantity = parseInt(newQuantity);
+            if (isNaN(newQuantity) || newQuantity < 1) {
+                newQuantity = 1;
+            }
+
+            // Show loading state on quantity buttons
+            const buttons = $(`#cart-item-${cartItemId} .btn`);
+            buttons.prop('disabled', true);
+
+            $.ajax({
+                url: '@Url.Action("UpdateQuantity", "Cart")',
+                type: 'POST',
+                data: {
+                    cartItemId: cartItemId,
+                    quantity: newQuantity,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                        buttons.prop('disabled', false);
+                    }
+                },
+                error: function () {
+                    alert('Error updating cart');
+                    buttons.prop('disabled', false);
+                }
+            });
+        }
+
+        function removeItem(cartItemId) {
+            if (confirm('Remove this item from cart?')) {
+                // Show loading state on remove button
+                const button = $(`#cart-item-${cartItemId} .btn-danger`);
+                button.html('<i class="fas fa-spinner fa-spin"></i>');
+                button.prop('disabled', true);
+
+                $.ajax({
+                    url: '@Url.Action("RemoveItem", "Cart")',
+                    type: 'POST',
+                    data: {
+                        cartItemId: cartItemId,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function () {
+                        location.reload();
+                    },
+                    error: function () {
+                        alert('Error removing item');
+                        button.html('<i class="fas fa-trash-alt"></i>');
+                        button.prop('disabled', false);
+                    }
+                });
+            }
+        }
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function () {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+}

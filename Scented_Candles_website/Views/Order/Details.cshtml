@@ -1,0 +1,351 @@
+﻿@model Order
+
+@{
+    ViewData["Title"] = "Order Details #" + Model.Id;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Scented Candles</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #faf7f2;
+            color: #2c1810;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #800000;
+            text-decoration: none;
+            margin-bottom: 25px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+            .back-link:hover {
+                color: #5a0000;
+            }
+
+        .order-details-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .order-details-header {
+            padding: 24px 30px;
+            background: #800000;
+            color: white;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .order-details-header h1 {
+                font-size: 1.5em;
+                font-weight: 700;
+            }
+
+        .order-status-badge {
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-processing {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .status-shipped {
+            background: #e8eaf6;
+            color: #283593;
+        }
+
+        .status-delivered {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-cancelled {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .order-details-body {
+            padding: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+            .info-section h3 {
+                color: #800000;
+                font-size: 1em;
+                margin-bottom: 12px;
+            }
+
+            .info-section p {
+                margin-bottom: 5px;
+                font-size: 0.95em;
+            }
+
+            .info-section strong {
+                color: #2c1810;
+            }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+            .items-table th {
+                background: #800000;
+                color: white;
+                padding: 12px 15px;
+                text-align: left;
+                font-weight: 600;
+            }
+
+            .items-table td {
+                padding: 12px 15px;
+                border-bottom: 1px solid #f0e4d8;
+            }
+
+            .items-table tr:hover td {
+                background: #faf7f2;
+            }
+
+            .items-table .total-row {
+                background: #f8f9fa;
+                font-weight: 700;
+            }
+
+                .items-table .total-row td {
+                    border-bottom: none;
+                    padding: 15px;
+                }
+
+        .order-summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+            .order-summary .total {
+                font-size: 1.8em;
+                font-weight: 700;
+                color: #800000;
+            }
+
+        .btn-back {
+            padding: 10px 25px;
+            background: #800000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-back:hover {
+                background: #5a0000;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(128, 0, 0, 0.3);
+            }
+
+        @@media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .order-details-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 16px 20px;
+            }
+
+            .order-details-body {
+                padding: 16px 20px;
+            }
+
+            .order-summary {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .btn-back {
+                text-align: center;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .items-table th,
+            .items-table td {
+                padding: 8px 10px;
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a asp-action="History" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Order History
+        </a>
+
+        <div class="order-details-card">
+            <!-- Header -->
+            <div class="order-details-header">
+                <h1><i class="fas fa-receipt"></i> Order #@Model.Id</h1>
+                <span class="order-status-badge status-@Model.Status?.ToLower()">
+                    @{
+                        var statusIcons = new Dictionary<string, string>
+                    {
+                    { "Pending", "📋" },
+                    { "Processing", "⚙️" },
+                    { "Shipped", "🚚" },
+                    { "Delivered", "✅" },
+                    { "Cancelled", "❌" }
+                    };
+                    }
+                    @(statusIcons.ContainsKey(Model.Status) ? statusIcons[Model.Status] : "📦")
+                    @Model.Status
+                </span>
+            </div>
+
+            <!-- Body -->
+            <div class="order-details-body">
+                <!-- Customer & Shipping Info -->
+                <div class="info-grid">
+                    <div class="info-section">
+                        <h3><i class="fas fa-user"></i> Customer Information</h3>
+                        <p><strong>Name:</strong> @Model.User?.FirstName @Model.User?.LastName</p>
+                        <p><strong>Email:</strong> @Model.User?.Email</p>
+                        <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+                    </div>
+                    <div class="info-section">
+                        <h3><i class="fas fa-truck"></i> Shipping Address</h3>
+                        <p>@Model.ShippingAddress</p>
+                        <p>@Model.City, @Model.PostalCode</p>
+                        <p>@Model.Country</p>
+                        <p><strong>Order Date:</strong> @Model.OrderDate.ToString("MMM dd, yyyy hh:mm tt")</p>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <h3 style="color: #800000; margin: 20px 0 15px;">
+                    <i class="fas fa-box"></i> Order Items
+                </h3>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <tr>
+                                <td>@item.Product?.Name</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Price.ToString("C")</td>
+                                <td>@((item.Quantity * item.Price).ToString("C"))</td>
+                            </tr>
+                        }
+                        <tr class="total-row">
+                            <td colspan="3" style="text-align: right;">Total:</td>
+                            <td style="color: #800000; font-size: 1.2em;">@Model.TotalAmount.ToString("C")</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <div>
+                        <div style="font-weight: 600; color: #2c1810;">Order Summary</div>
+                        <div style="color: #7d6b5e; font-size: 0.9em;">
+                            @Model.OrderItems.Count items ·
+                            @if (Model.OrderDate.AddDays(7) > DateTime.Now && Model.Status != "Delivered" && Model.Status != "Cancelled")
+                            {
+                                <span style="color: #e65100;">Expected delivery: @Model.OrderDate.AddDays(7).ToString("MMM dd, yyyy")</span>
+                            }
+                            else
+                            {
+                                <span>Order completed</span>
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        <span class="total">@Model.TotalAmount.ToString("C")</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; text-align: right;">
+                    <a asp-action="History" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

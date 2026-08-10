@@ -1,0 +1,305 @@
+﻿@model CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Checkout";
+    var cartItems = ViewBag.CartItems as List<CartItem>;
+    var subtotal = ViewBag.Subtotal;
+    var shipping = ViewBag.Shipping;
+    var total = ViewBag.Total;
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4" style="color: #4a0000;">
+        <i class="fas fa-credit-card" style="color: #800000;"></i> Checkout
+    </h1>
+
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden;">
+                <div class="card-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shipping-fast me-2"></i> Shipping Information
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Checkout" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 rounded-3" style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); color: #721c24; border-left: 4px solid #dc3545;"></div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label fw-semibold" style="color: #4a0000;">
+                                    <i class="fas fa-user me-1" style="color: #800000;"></i> First Name
+                                </label>
+                                <input asp-for="FirstName" class="form-control" placeholder="Enter your first name" style="border-radius: 12px; border: 1px solid #dee2e6; padding: 12px;" />
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label fw-semibold" style="color: #4a0000;">
+                                    <i class="fas fa-user me-1" style="color: #800000;"></i> Last Name
+                                </label>
+                                <input asp-for="LastName" class="form-control" placeholder="Enter your last name" style="border-radius: 12px; border: 1px solid #dee2e6; padding: 12px;" />
+                                <span asp-validation-for="LastName" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-semibold" style="color: #4a0000;">
+                                <i class="fas fa-envelope me-1" style="color: #800000;"></i> Email Address
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
+                                    <i class="fas fa-envelope" style="color: #800000;"></i>
+                                </span>
+                                <input asp-for="Email" class="form-control" readonly style="background: #f8f9fa; border-radius: 0 12px 12px 0;" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label fw-semibold" style="color: #4a0000;">
+                                <i class="fas fa-phone me-1" style="color: #800000;"></i> Phone Number
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
+                                    <i class="fas fa-phone" style="color: #800000;"></i>
+                                </span>
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="Enter your phone number" style="border-radius: 0 12px 12px 0;" />
+                            </div>
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ShippingAddress" class="form-label fw-semibold" style="color: #4a0000;">
+                                <i class="fas fa-location-dot me-1" style="color: #800000;"></i> Shipping Address
+                            </label>
+                            <textarea asp-for="ShippingAddress" class="form-control" rows="2" placeholder="Enter your full address" style="border-radius: 12px;"></textarea>
+                            <span asp-validation-for="ShippingAddress" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="City" class="form-label fw-semibold" style="color: #4a0000;">
+                                    <i class="fas fa-city me-1" style="color: #800000;"></i> City
+                                </label>
+                                <input asp-for="City" class="form-control" placeholder="Enter your city" style="border-radius: 12px;" />
+                                <span asp-validation-for="City" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="PostalCode" class="form-label fw-semibold" style="color: #4a0000;">
+                                    <i class="fas fa-mail-bulk me-1" style="color: #800000;"></i> Postal Code
+                                </label>
+                                <input asp-for="PostalCode" class="form-control" placeholder="Postal code" style="border-radius: 12px;" />
+                                <span asp-validation-for="PostalCode" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="Country" class="form-label fw-semibold" style="color: #4a0000;">
+                                    <i class="fas fa-globe me-1" style="color: #800000;"></i> Country
+                                </label>
+                                <input asp-for="Country" class="form-control" placeholder="Country" style="border-radius: 12px;" />
+                                <span asp-validation-for="Country" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-lg w-100 mt-3" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; border-radius: 50px; padding: 14px; font-weight: 600; transition: all 0.3s ease;">
+                            <i class="fas fa-check-circle me-2"></i> Place Order
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden; position: sticky; top: 20px;">
+                <div class="card-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-receipt me-2"></i> Order Summary
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Order Items -->
+                    <div class="order-items mb-3" style="max-height: 300px; overflow-y: auto;">
+                        @foreach (var item in cartItems)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2" style="border-bottom: 1px solid #f0f0f0;">
+                                <div class="d-flex align-items-center">
+                                    @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
+                                    {
+                                        <img src="@item.Product.ImageUrl" alt="@item.Product.Name" style="width: 50px; height: 50px; object-fit: cover; border-radius: 10px;" class="me-3">
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-light d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; border-radius: 10px;">
+                                            <i class="fas fa-candle" style="color: #800000;"></i>
+                                        </div>
+                                    }
+                                    <div>
+                                        <p class="mb-0 fw-semibold" style="color: #4a0000;">@item.Product?.Name</p>
+                                        <small class="text-muted">Qty: @item.Quantity</small>
+                                    </div>
+                                </div>
+                                <span class="fw-bold" style="color: #800000;">@((item.Quantity * (item.Product?.Price ?? 0)).ToString("C"))</span>
+                            </div>
+                        }
+                    </div>
+
+                    <hr class="my-3" style="border-color: #f0f0f0;">
+
+                    <!-- Totals -->
+                    <div class="totals">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="color: #4a0000;">Subtotal</span>
+                            <span style="color: #800000;">@subtotal.ToString("C")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="color: #4a0000;">Shipping</span>
+                            <span style="color: #800000;">@shipping.ToString("C")</span>
+                        </div>
+                        <hr class="my-2" style="border-color: #f0f0f0;">
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong style="color: #4a0000;">Total</strong>
+                            <strong style="color: #800000; font-size: 1.2rem;">@total.ToString("C")</strong>
+                        </div>
+                    </div>
+
+                    <!-- Free Shipping Info -->
+                    <div class="alert alert-info small mt-3" style="background: rgba(128, 0, 0, 0.05); border: none; border-left: 3px solid #800000; border-radius: 12px;">
+                        <i class="fas fa-truck me-2" style="color: #800000;"></i>
+                        Free shipping on orders over $100!
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="payment-methods mt-3 text-center">
+                        <p class="small text-muted mb-2">Secure payment methods</p>
+                        <div>
+                            <i class="fab fa-cc-visa fa-2x me-2" style="color: #1a1f71;"></i>
+                            <i class="fab fa-cc-mastercard fa-2x me-2" style="color: #eb001b;"></i>
+                            <i class="fab fa-cc-amex fa-2x me-2" style="color: #006fcf;"></i>
+                            <i class="fab fa-cc-paypal fa-2x" style="color: #003087;"></i>
+                        </div>
+                        <p class="small text-muted mt-2">
+                            <i class="fas fa-lock me-1"></i> Your payment information is secure
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Form Input Focus Effects */
+    .form-control:focus {
+        border-color: #800000;
+        box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
+    }
+
+    /* Button Hover Effect */
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(128, 0, 0, 0.3);
+    }
+
+    /* Order Items Scrollbar */
+    .order-items::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .order-items::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .order-items::-webkit-scrollbar-thumb {
+        background: #800000;
+        border-radius: 10px;
+    }
+
+    /* Card Animation */
+    .card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Sticky Order Summary */
+    @@media (min-width: 992px) {
+        .col-lg-5 .card {
+            position: sticky;
+            top: 20px;
+        }
+    }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 768px) {
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .btn {
+            padding: 12px;
+        }
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Auto-format phone number
+        const phoneInput = document.getElementById('PhoneNumber');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function (e) {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 0) {
+                    if (value.length <= 3) {
+                        this.value = value;
+                    } else if (value.length <= 6) {
+                        this.value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+                    } else {
+                        this.value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+                    }
+                }
+            });
+        }
+
+        // Auto-capitalize first letter of city and country
+        const cityInput = document.getElementById('City');
+        const countryInput = document.getElementById('Country');
+
+        function capitalizeFirstLetter(input) {
+            if (input) {
+                input.addEventListener('blur', function () {
+                    if (this.value) {
+                        this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1).toLowerCase();
+                    }
+                });
+            }
+        }
+
+        capitalizeFirstLetter(cityInput);
+        capitalizeFirstLetter(countryInput);
+
+        // Postal code validation (numbers only)
+        const postalInput = document.getElementById('PostalCode');
+        if (postalInput) {
+            postalInput.addEventListener('input', function (e) {
+                this.value = this.value.replace(/\D/g, '').slice(0, 5);
+            });
+        }
+    </script>
+}

@@ -1,0 +1,440 @@
+﻿@model IEnumerable<ApplicationUser>
+
+@{
+    ViewData["Title"] = "Manage Users";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0" style="color: #4a0000;">
+            <i class="fas fa-users" style="color: #800000;"></i> Manage Users
+        </h1>
+        <div>
+            <a asp-action="RegisterAdmin" asp-controller="Account" class="btn me-2" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; border-radius: 12px;">
+                <i class="fas fa-user-plus"></i> Create New Admin
+            </a>
+            <a asp-action="Dashboard" class="btn btn-secondary" style="border-radius: 12px;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100 py-2" style="border-radius: 15px; border-left: 4px solid #800000;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #800000;">
+                                Total Users
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count()</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x" style="color: #800000;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100 py-2" style="border-radius: 15px; border-left: 4px solid #28a745;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #28a745;">
+                                Active Users
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @Model.Count(u => u.IsActive)
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x" style="color: #28a745;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100 py-2" style="border-radius: 15px; border-left: 4px solid #dc3545;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #dc3545;">
+                                Admins
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @{
+                                    var adminCount = 0;
+                                    foreach (var user in Model)
+                                    {
+                                        var roles = ViewBag.UserRoles as Dictionary<string, string>;
+                                        if (roles != null && roles.ContainsKey(user.Id) && roles[user.Id] == "Admin")
+                                        {
+                                            adminCount++;
+                                        }
+                                    }
+                                    @adminCount
+                                }
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-shield fa-2x" style="color: #dc3545;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100 py-2" style="border-radius: 15px; border-left: 4px solid #17a2b8;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #17a2b8;">
+                                Customers
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @{
+                                    var customerCount = 0;
+                                    foreach (var user in Model)
+                                    {
+                                        var roles = ViewBag.UserRoles as Dictionary<string, string>;
+                                        if (roles != null && roles.ContainsKey(user.Id) && roles[user.Id] == "Customer")
+                                        {
+                                            customerCount++;
+                                        }
+                                    }
+                                    @customerCount
+                                }
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user fa-2x" style="color: #17a2b8;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 20px; overflow: hidden;">
+        <div class="card-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none;">
+            <h6 class="m-0 fw-bold">
+                <i class="fas fa-users me-2"></i> All Users
+            </h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="usersTable" width="100%" cellspacing="0">
+                    <thead style="background: #f8f9fa;">
+                        <tr style="color: #4a0000;">
+                            <th class="ps-4">Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Registered Date</th>
+                            <th class="pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.OrderByDescending(u => u.CreatedAt))
+                        {
+                            var role = ViewBag.UserRoles != null && ViewBag.UserRoles.ContainsKey(user.Id) ? ViewBag.UserRoles[user.Id] as string : "No Role";
+
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-2" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%);">
+                                            <span class="initials">@user.FirstName.Substring(0, 1)@user.LastName.Substring(0, 1)</span>
+                                        </div>
+                                        <div>
+                                            <strong style="color: #4a0000;">@user.FirstName @user.LastName</strong>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="color: #555;">@user.Email</td>
+                                <td>
+                                    @if (role == "Admin")
+                                    {
+                                        <span class="badge" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%);">
+                                            <i class="fas fa-user-shield"></i> Admin
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge" style="background: #17a2b8;">
+                                            <i class="fas fa-user"></i> Customer
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (user.IsActive)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle"></i> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-ban"></i> Inactive
+                                        </span>
+                                    }
+                                </td>
+                                <td>@user.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td class="pe-4">
+                                    <a asp-action="EditUser" asp-route-id="@user.Id" class="btn btn-sm me-1" title="Edit User" style="background: #800000; color: white; border: none; border-radius: 8px;">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+
+                                    @if (user.Email != "admin@scentedcandles.com")
+                                    {
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@user.Id" title="Delete User" style="border-radius: 8px;">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+
+                                        <!-- Delete Confirmation Modal -->
+                                        <div class="modal fade" id="deleteModal-@user.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@user.Id" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+                                                    <div class="modal-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none;">
+                                                        <h5 class="modal-title" id="deleteModalLabel-@user.Id">
+                                                            <i class="fas fa-exclamation-triangle"></i> Confirm Delete
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body text-center p-4">
+                                                        <div class="mb-3">
+                                                            <i class="fas fa-user-times fa-5x" style="color: #dc3545;"></i>
+                                                        </div>
+                                                        <h5 style="color: #4a0000;">Are you sure you want to delete this user?</h5>
+                                                        <div class="alert alert-warning mt-3 text-start" style="border-radius: 12px;">
+                                                            <strong>User Details:</strong><br />
+                                                            <strong>Name:</strong> @user.FirstName @user.LastName<br />
+                                                            <strong>Email:</strong> @user.Email<br />
+                                                            <strong>Role:</strong> @role<br />
+                                                            <strong>Status:</strong> @(user.IsActive ? "Active" : "Inactive")
+                                                        </div>
+                                                        <p class="text-danger mt-2 small">
+                                                            <i class="fas fa-info-circle"></i> This action cannot be undone. All data associated with this user will be permanently removed.
+                                                        </p>
+                                                    </div>
+                                                    <div class="modal-footer" style="border-top: none;">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">
+                                                            <i class="fas fa-times"></i> Cancel
+                                                        </button>
+                                                        <form asp-action="DeleteUser" method="post">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="id" value="@user.Id" />
+                                                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; border-radius: 10px;">
+                                                                <i class="fas fa-trash"></i> Yes, Delete User
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-secondary" disabled title="Cannot delete default admin" style="border-radius: 8px;">
+                                            <i class="fas fa-lock"></i> Protected
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Avatar Circle Styling */
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .initials {
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    /* Badge Styling */
+    .badge {
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        border-radius: 20px;
+    }
+    
+    .badge i {
+        margin-right: 5px;
+    }
+    
+    /* Table Styling */
+    .table {
+        vertical-align: middle;
+    }
+    
+    .table-hover tbody tr:hover {
+        background: rgba(128, 0, 0, 0.03);
+        transition: all 0.3s ease;
+    }
+    
+    /* Button Hover Effects */
+    .btn:hover {
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+    }
+    
+    /* Card Animation */
+    .card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+    
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Statistics Card Animation */
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(128, 0, 0, 0.1) !important;
+    }
+    
+    /* Modal Animation */
+    .modal-content {
+        animation: modalFadeIn 0.3s ease-out;
+    }
+    
+    @@keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    /* Responsive Adjustments */
+    @@media (max-width: 768px) {
+        .table-responsive {
+            font-size: 0.85rem;
+        }
+        
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+        
+        .avatar-circle {
+            width: 30px;
+            height: 30px;
+        }
+        
+        .initials {
+            font-size: 11px;
+        }
+    }
+    
+    /* DataTables Styling */
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        margin: 15px;
+    }
+    
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 50px;
+        border: 1px solid #dee2e6;
+        padding: 8px 15px;
+        margin-left: 10px;
+    }
+    
+    .dataTables_wrapper .dataTables_filter input:focus {
+        border-color: #800000;
+        box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #800000;
+        color: white !important;
+        border: none;
+        border-radius: 8px;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #5a0000;
+        color: white !important;
+        border: none;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#usersTable').DataTable({
+                "order": [[4, "desc"]],
+                "language": {
+                    "search": "🔍 Search users:",
+                    "lengthMenu": "Show _MENU_ users per page",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ users",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "→",
+                        "previous": "←"
+                    }
+                },
+                "pageLength": 10,
+                "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                       '<"row"<"col-sm-12"tr>>' +
+                       '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
+            });
+        });
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function () {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+        
+        // Add tooltip to buttons
+        $(document).ready(function() {
+            $('[title]').tooltip();
+        });
+    </script>
+
+    <!-- DataTables CSS and JS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+}

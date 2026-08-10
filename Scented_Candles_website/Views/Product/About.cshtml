@@ -1,0 +1,703 @@
+﻿@{
+    ViewData["Title"] = ViewBag.PageTitle ?? "About Us - Scented Candles";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #faf7f2;
+            color: #2c1810;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .about-hero {
+            text-align: center;
+            padding: 80px 20px 60px;
+            background: linear-gradient(135deg, #f5eee9 0%, #e8d9cc 100%);
+            border-radius: 20px;
+            margin: 20px 0 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 60%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+
+        .about-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            color: #2c1810;
+            font-weight: 700;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .about-hero h1 span {
+            color: #b99a85;
+            font-style: italic;
+        }
+
+        .about-hero p {
+            font-size: 1.2em;
+            color: #7d6b5e;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .about-hero .divider {
+            width: 80px;
+            height: 3px;
+            background: #b99a85;
+            margin: 20px auto;
+            border-radius: 2px;
+        }
+
+        /* ===== MISSION SECTION ===== */
+        .mission-section {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 50px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .mission-icon {
+            font-size: 50px;
+            color: #b99a85;
+            margin-bottom: 20px;
+        }
+
+        .mission-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: #2c1810;
+            margin-bottom: 15px;
+        }
+
+        .mission-section p {
+            font-size: 1.1em;
+            color: #5a4a3e;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* ===== STORY SECTION ===== */
+        .story-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 60px;
+            align-items: center;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .story-image {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .story-image img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .story-image:hover img {
+            transform: scale(1.03);
+        }
+
+        .story-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2em;
+            color: #2c1810;
+            margin-bottom: 20px;
+        }
+
+        .story-content h2 span {
+            color: #b99a85;
+        }
+
+        .story-content p {
+            color: #5a4a3e;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .story-content .highlight {
+            color: #800000;
+            font-weight: 600;
+        }
+
+        /* ===== VALUES SECTION ===== */
+        .values-section {
+            margin-bottom: 60px;
+        }
+
+        .values-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            text-align: center;
+            color: #2c1810;
+            margin-bottom: 15px;
+        }
+
+        .values-section .subtitle {
+            text-align: center;
+            color: #7d6b5e;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .value-card {
+            text-align: center;
+            padding: 35px 25px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .value-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-color: #b99a85;
+        }
+
+        .value-card .icon-circle {
+            width: 70px;
+            height: 70px;
+            background: rgba(185, 154, 133, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 30px;
+            color: #b99a85;
+            transition: all 0.3s;
+        }
+
+        .value-card:hover .icon-circle {
+            background: #b99a85;
+            color: white;
+        }
+
+        .value-card h3 {
+            font-size: 1.2em;
+            color: #2c1810;
+            margin-bottom: 10px;
+        }
+
+        .value-card p {
+            color: #7d6b5e;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        /* ===== STATS SECTION ===== */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            padding: 50px 30px;
+            background: linear-gradient(135deg, #800000 0%, #5a0000 100%);
+            border-radius: 20px;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item .number {
+            font-size: 2.8em;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-item .label {
+            font-size: 1em;
+            opacity: 0.8;
+        }
+
+        /* ===== TESTIMONIALS ===== */
+        .testimonials-section {
+            margin-bottom: 60px;
+        }
+
+        .testimonials-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            text-align: center;
+            color: #2c1810;
+            margin-bottom: 40px;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .testimonial-card .stars {
+            color: #ffc107;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .testimonial-card p {
+            color: #5a4a3e;
+            font-style: italic;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .testimonial-card .author {
+            font-weight: 600;
+            color: #2c1810;
+        }
+
+        .testimonial-card .role {
+            font-size: 0.85em;
+            color: #b99a85;
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline-section {
+            margin-bottom: 60px;
+        }
+
+        .timeline-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            text-align: center;
+            color: #2c1810;
+            margin-bottom: 40px;
+        }
+
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: #e8d9cc;
+        }
+
+        .timeline-item {
+            text-align: center;
+            position: relative;
+        }
+
+        .timeline-item .year {
+            width: 60px;
+            height: 60px;
+            background: #800000;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: 700;
+            margin: 0 auto 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-item h4 {
+            color: #2c1810;
+            margin-bottom: 5px;
+        }
+
+        .timeline-item p {
+            color: #7d6b5e;
+            font-size: 0.9em;
+        }
+
+        /* ===== NEWSLETTER ===== */
+        .newsletter-section {
+            background: #2c1810;
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 60px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .newsletter-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4em;
+            margin-bottom: 10px;
+        }
+
+        .newsletter-section p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 25px;
+        }
+
+        .newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            gap: 10px;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .newsletter-form button {
+            padding: 14px 30px;
+            background: #b99a85;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .newsletter-form button:hover {
+            background: #9c7b66;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @@media (max-width: 1024px) {
+            .story-section {
+                grid-template-columns: 1fr;
+                padding: 30px;
+            }
+
+            .story-image img {
+                height: 300px;
+            }
+
+            .values-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .timeline::before {
+                display: none;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .about-hero h1 {
+                font-size: 2.5em;
+            }
+
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr 1fr;
+                padding: 30px 20px;
+            }
+
+            .stat-item .number {
+                font-size: 2em;
+            }
+
+            .timeline {
+                grid-template-columns: 1fr;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .story-section {
+                padding: 20px;
+            }
+
+            .story-image img {
+                height: 200px;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .about-hero h1 {
+                font-size: 1.8em;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            .mission-section h2 {
+                font-size: 1.8em;
+            }
+
+            .values-section h2 {
+                font-size: 1.8em;
+            }
+
+            .testimonials-section h2 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== HERO SECTION ===== -->
+        <section class="about-hero">
+            <h1>About <span>Us</span></h1>
+            <div class="divider"></div>
+            <p>Handcrafted with love, inspired by nature — creating moments that linger long after the flame goes out.</p>
+        </section>
+
+        <!-- ===== MISSION SECTION ===== -->
+        <section class="mission-section">
+            <div class="mission-icon">
+                <i class="fas fa-candle-holder"></i>
+            </div>
+            <h2>Our Mission</h2>
+            <p>
+                To create beautiful, eco-friendly candles that bring warmth, comfort, and joy to every home 
+                while using only the finest natural ingredients. We believe that every moment deserves to be 
+                celebrated with light and fragrance.
+            </p>
+        </section>
+
+        <!-- ===== STORY SECTION ===== -->
+        <section class="story-section">
+            <div class="story-image">
+                <img src="https://images.unsplash.com/photo-1603006905003-be475563bc59?w=600&h=400&fit=crop" alt="Our Workshop">
+            </div>
+            <div class="story-content">
+                <h2>Our <span>Story</span></h2>
+                <p>
+                    Founded in 2023, <span class="highlight">Scented Candles</span> began with a simple idea: 
+                    create candles that don't just smell good, but tell a story. What started as a small home-based 
+                    hobby quickly grew into a passion for crafting unique, high-quality candles.
+                </p>
+                <p>
+                    Each candle is <span class="highlight">hand-poured</span> using 100% natural soy wax, 
+                    lead-free cotton wicks, and premium fragrance oils. We believe that the moments we spend 
+                    at home should be filled with scents that inspire, calm, and rejuvenate.
+                </p>
+                <p>
+                    Today, we're proud to offer a diverse collection of candles that cater to every mood and occasion.
+                </p>
+            </div>
+        </section>
+
+        <!-- ===== VALUES SECTION ===== -->
+        <section class="values-section">
+            <h2>What We Stand For</h2>
+            <p class="subtitle">Quality you can see, scents you'll love, and values you can trust</p>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="icon-circle">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Quality First</h3>
+                    <p>We use only the finest ingredients and materials to ensure every candle is perfect.</p>
+                </div>
+                <div class="value-card">
+                    <div class="icon-circle">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Eco-Friendly</h3>
+                    <p>Our candles are made with sustainable soy wax and recyclable packaging.</p>
+                </div>
+                <div class="value-card">
+                    <div class="icon-circle">
+                        <i class="fas fa-hand-sparkles"></i>
+                    </div>
+                    <h3>Handcrafted</h3>
+                    <p>Each candle is carefully hand-poured and inspected for quality.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== STATS SECTION ===== -->
+        <section class="stats-section">
+            <div class="stat-item">
+                <span class="number">5000+</span>
+                <span class="label">Happy Customers</span>
+            </div>
+            <div class="stat-item">
+                <span class="number">50+</span>
+                <span class="label">Unique Scents</span>
+            </div>
+            <div class="stat-item">
+                <span class="number">100%</span>
+                <span class="label">Natural Ingredients</span>
+            </div>
+            <div class="stat-item">
+                <span class="number">24/7</span>
+                <span class="label">Customer Support</span>
+            </div>
+        </section>
+
+        <!-- ===== TIMELINE SECTION ===== -->
+        <section class="timeline-section">
+            <h2>Our Journey</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="year">2023</div>
+                    <h4>The Beginning</h4>
+                    <p>Started with 5 signature scents from a small home workshop</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="year">2024</div>
+                    <h4>Growth</h4>
+                    <p>Expanded to 30+ unique fragrances and opened our online store</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="year">2025</div>
+                    <h4>Sustainability</h4>
+                    <p>Launched eco-friendly packaging and soy wax collection</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TESTIMONIALS ===== -->
+        <section class="testimonials-section">
+            <h2>What Our Customers Say</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p>"Absolutely love these candles! The lavender scent is so calming and the quality is unmatched."</p>
+                    <div class="author">Jessica M.</div>
+                    <div class="role">Loyal Customer</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p>"Best candles I've ever bought. The vanilla scent fills my entire home with warmth."</p>
+                    <div class="author">David R.</div>
+                    <div class="role">Repeat Customer</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p>"The eco-friendly packaging and beautiful scents make this my go-to candle shop!"</p>
+                    <div class="author">Sarah K.</div>
+                    <div class="role">Eco-Conscious Shopper</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== NEWSLETTER ===== -->
+        <section class="newsletter-section">
+            <h2>Join Our Community</h2>
+            <p>Subscribe to receive updates, exclusive offers, and candle care tips</p>
+            <form class="newsletter-form" method="post" asp-action="Subscribe" asp-controller="Home">
+                <input type="email" placeholder="Your email address" required>
+                <button type="submit">
+                    <i class="fas fa-paper-plane"></i> Subscribe
+                </button>
+            </form>
+        </section>
+    </div>
+</body>
+</html>
