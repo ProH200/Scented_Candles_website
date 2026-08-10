@@ -1115,8 +1115,8 @@
                                         <div class="product-price">
                                             @if (product.IsOnSale && product.SalePrice.HasValue)
                                             {
-                                                <span class="sale-price">$@product.SalePrice.Value.ToString("F2")</span>
-                                                <span class="original">$@product.Price.ToString("F2")</span>
+                                                <span class="sale-price">R@product.SalePrice.Value.ToString("F2")</span>
+                                                <span class="original">R@product.Price.ToString("F2")</span>
                                             }
                                             else
                                             {

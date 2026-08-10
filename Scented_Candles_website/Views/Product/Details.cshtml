@@ -523,9 +523,9 @@
                 <div class="product-price-section">
                     @if (Model.IsOnSale && Model.SalePrice.HasValue)
                     {
-                        <span class="product-price">$@Model.SalePrice.Value.ToString("F2")</span>
-                        <span class="original-price">$@Model.Price.ToString("F2")</span>
-                        <span class="savings">Save $@savings.ToString("F2") (@(Model.DiscountPercentage ?? 0)% off)</span>
+                        <span class="product-price">R@Model.SalePrice.Value.ToString("F2")</span>
+                        <span class="original-price">R@Model.Price.ToString("F2")</span>
+                        <span class="savings">Save R@savings.ToString("F2") (@(Model.DiscountPercentage ?? 0)% off)</span>
                     }
                     else
                     {
