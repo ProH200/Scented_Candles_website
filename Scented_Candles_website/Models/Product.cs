@@ -107,20 +107,23 @@ namespace ScentedCandleWebsite.Models
         [Display(Name = "Required Role")]
         public string RequiredRole { get; set; } = "Customer";
 
+        // ===== CALCULATED PROPERTIES =====
+        // These are NOT stored in the database
+        // [NotMapped] tells Entity Framework to ignore these when creating tables
+
         
-       // [NotMapped]Telling the database not to add the columnin the database...
         [Display(Name = "Current Price")]
         public decimal CurrentPrice => IsOnSale && SalePrice.HasValue ? SalePrice.Value : Price;
 
-        //[NotMapped] Telling the database not to add the column in the database...
+        
         [Display(Name = "Savings")]
         public decimal Savings => IsOnSale && SalePrice.HasValue ? Price - SalePrice.Value : 0;
 
-        //[NotMapped]
+        
         [Display(Name = "In Stock")]
         public bool InStock => IsActive && StockQuantity > 0;
 
-        //[NotMapped]
+        
         [Display(Name = "Low Stock")]
         public bool LowStock => InStock && StockQuantity < 10;
     }

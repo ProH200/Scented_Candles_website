@@ -12,8 +12,8 @@ using ScentedCandleWebsite.Data;
 namespace Scented_Candles_website.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260427122158_promise")]
-    partial class promise
+    [Migration("20260811135800__promise")]
+    partial class _promise
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -293,6 +293,33 @@ namespace Scented_Candles_website.Migrations
                         .IsUnique();
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("ScentedCandleWebsite.Models.NewsletterSubscriber", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("SubscribedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UnsubscribedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NewsletterSubscribers");
                 });
 
             modelBuilder.Entity("ScentedCandleWebsite.Models.Order", b =>

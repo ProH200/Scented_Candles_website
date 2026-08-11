@@ -6,40 +6,37 @@
     var categories = ViewBag.Categories as List<ScentedCandleWebsite.Models.Category>;
 }
 
-<div class="container-fluid px-4">
+<div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-xl-10 col-lg-11">
-            <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden;">
-                <div class="card-header py-3" style="background: #800000; color: white; border: none;">
-                    <h4 class="mb-0 fw-bold">
+        <div class="col-md-10">
+            <div class="card shadow border-0" style="border-radius: 20px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none;">
+                    <h4 class="mb-0">
                         <i class="fas fa-plus-circle me-2"></i> Create New Candle
                     </h4>
                 </div>
-                <div class="card-body" style="background: white; padding: 24px;">
+                <div class="card-body p-4">
                     @if (TempData["Error"] != null)
                     {
-                        <div class="alert alert-danger alert-dismissible fade show border-0 rounded-3 shadow-sm" role="alert" style="border-left: 4px solid #dc3545;">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     }
 
-                    <form asp-action="CreateProduct" method="post" enctype="multipart/form-data">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 rounded-3"></div>
+                    <form asp-action="CreateProduct" asp-controller="Admin" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
                         <div class="row g-3">
                             <div class="col-md-8">
-                                <label asp-for="Name" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-candle-holder me-1"></i> Candle Name *
-                                </label>
+                                <label asp-for="Name" class="form-label fw-bold" style="color: #800000;">Candle Name *</label>
                                 <input asp-for="Name" class="form-control" placeholder="e.g., Lavender Dreams" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;" />
-                                <span asp-validation-for="Name" class="text-danger" style="font-size: 0.85rem;"></span>
+                                <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-4">
-                                <label asp-for="Scent" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-leaf me-1"></i> Scent *
-                                </label>
+                                <label asp-for="Scent" class="form-label fw-bold" style="color: #800000;">Scent *</label>
                                 <select asp-for="Scent" class="form-control" id="scentSelect" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;">
                                     <option value="">Select a scent</option>
                                     <option value="Vanilla">Vanilla</option>
@@ -55,46 +52,38 @@
                                     <option value="Custom">Custom (Enter Below)</option>
                                 </select>
                                 <input type="text" id="customScent" class="form-control mt-2" placeholder="Enter custom scent" style="display:none; border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;" />
-                                <span asp-validation-for="Scent" class="text-danger" style="font-size: 0.85rem;"></span>
+                                <span asp-validation-for="Scent" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-12">
-                                <label asp-for="Description" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-align-left me-1"></i> Description *
-                                </label>
+                                <label asp-for="Description" class="form-label fw-bold" style="color: #800000;">Description *</label>
                                 <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the candle's fragrance, mood, and benefits..." style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px; resize: vertical;"></textarea>
-                                <span asp-validation-for="Description" class="text-danger" style="font-size: 0.85rem;"></span>
+                                <span asp-validation-for="Description" class="text-danger"></span>
                                 <small class="form-text text-muted">Include scent notes, mood, and ideal use.</small>
                             </div>
                         </div>
 
                         <div class="row g-3 mt-1">
                             <div class="col-md-4">
-                                <label asp-for="Price" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-rand me-1"></i> Price *
-                                </label>
+                                <label asp-for="Price" class="form-label fw-bold" style="color: #800000;">Price (R) *</label>
                                 <div class="input-group">
-                                    <span class="input-group-text" style="background: #800000; color: white; border: 2px solid #800000; border-radius: 10px 0 0 10px;">$</span>
-                                    <input asp-for="Price" class="form-control" placeholder="0.00" id="priceInput" style="border-radius: 0 10px 10px 0; border: 2px solid #e8d9cc; padding: 10px 15px;" />
+                                    <span class="input-group-text" style="background: #800000; color: white; border: 2px solid #800000; border-radius: 10px 0 0 10px;">R</span>
+                                    <input asp-for="Price" class="form-control" id="priceInput" placeholder="0.00" style="border-radius: 0 10px 10px 0; border: 2px solid #e8d9cc; padding: 10px 15px;" />
                                 </div>
-                                <span asp-validation-for="Price" class="text-danger" style="font-size: 0.85rem;"></span>
-                                <small class="form-text text-muted">Enter price (e.g., 24.99)</small>
+                                <span asp-validation-for="Price" class="text-danger"></span>
+                                <small class="form-text text-muted">Enter price in Rands (e.g., 24.99)</small>
                             </div>
 
                             <div class="col-md-4">
-                                <label asp-for="StockQuantity" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-boxes me-1"></i> Stock Quantity *
-                                </label>
-                                <input asp-for="StockQuantity" class="form-control" placeholder="0" id="stockInput" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;" />
-                                <span asp-validation-for="StockQuantity" class="text-danger" style="font-size: 0.85rem;"></span>
+                                <label asp-for="StockQuantity" class="form-label fw-bold" style="color: #800000;">Stock Quantity *</label>
+                                <input asp-for="StockQuantity" class="form-control" id="stockInput" placeholder="0" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;" />
+                                <span asp-validation-for="StockQuantity" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-4">
-                                <label asp-for="CategoryId" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-tag me-1"></i> Category
-                                </label>
+                                <label asp-for="CategoryId" class="form-label fw-bold" style="color: #800000;">Category</label>
                                 <select asp-for="CategoryId" class="form-control" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;">
                                     <option value="">Select a category</option>
                                     @if (categories != null && categories.Any())
@@ -109,33 +98,28 @@
                                         <option value="" disabled>No categories available</option>
                                     }
                                 </select>
-                                <span asp-validation-for="CategoryId" class="text-danger" style="font-size: 0.85rem;"></span>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
                             </div>
                         </div>
 
+                        <!-- Additional Properties -->
                         <div class="row g-3 mt-1">
                             <div class="col-md-6">
-                                <label asp-for="Color" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-palette me-1"></i> Color
-                                </label>
+                                <label asp-for="Color" class="form-label fw-bold" style="color: #800000;">Color</label>
                                 <input asp-for="Color" class="form-control" placeholder="e.g., Purple, White, Blue" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;" />
-                                <span asp-validation-for="Color" class="text-danger" style="font-size: 0.85rem;"></span>
+                                <span asp-validation-for="Color" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-6">
-                                <label asp-for="BurnTime" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="far fa-clock me-1"></i> Burn Time
-                                </label>
+                                <label asp-for="BurnTime" class="form-label fw-bold" style="color: #800000;">Burn Time</label>
                                 <input asp-for="BurnTime" class="form-control" placeholder="e.g., 30-40 hours" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;" />
-                                <span asp-validation-for="BurnTime" class="text-danger" style="font-size: 0.85rem;"></span>
+                                <span asp-validation-for="BurnTime" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="row g-3 mt-1">
                             <div class="col-md-6">
-                                <label asp-for="WaxType" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-tint me-1"></i> Wax Type
-                                </label>
+                                <label asp-for="WaxType" class="form-label fw-bold" style="color: #800000;">Wax Type</label>
                                 <select asp-for="WaxType" class="form-control" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;">
                                     <option value="Soy Wax">Soy Wax</option>
                                     <option value="Beeswax">Beeswax</option>
@@ -143,15 +127,13 @@
                                     <option value="Coconut Wax">Coconut Wax</option>
                                     <option value="Palm Wax">Palm Wax</option>
                                 </select>
-                                <span asp-validation-for="WaxType" class="text-danger" style="font-size: 0.85rem;"></span>
+                                <span asp-validation-for="WaxType" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-6">
-                                <label asp-for="Size" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-weight-hanging me-1"></i> Size/Weight
-                                </label>
+                                <label asp-for="Size" class="form-label fw-bold" style="color: #800000;">Size/Weight</label>
                                 <input asp-for="Size" class="form-control" placeholder="e.g., 8oz, 12oz, Large" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;" />
-                                <span asp-validation-for="Size" class="text-danger" style="font-size: 0.85rem;"></span>
+                                <span asp-validation-for="Size" class="text-danger"></span>
                             </div>
                         </div>
 
@@ -177,37 +159,32 @@
                             </div>
                         </div>
 
+                        <!-- Sale Price Section (shown when On Sale is checked) -->
                         <div id="salePriceSection" style="display:none;">
-                            <div class="row g-3 mt-2">
+                            <div class="row g-3 mt-1">
                                 <div class="col-md-6">
-                                    <label asp-for="SalePrice" class="form-label fw-bold" style="color: #800000;">
-                                        <i class="fas fa-dollar-sign me-1"></i> Sale Price
-                                    </label>
+                                    <label asp-for="SalePrice" class="form-label fw-bold" style="color: #800000;">Sale Price</label>
                                     <div class="input-group">
-                                        <span class="input-group-text" style="background: #800000; color: white; border: 2px solid #800000; border-radius: 10px 0 0 10px;">$</span>
+                                        <span class="input-group-text" style="background: #800000; color: white; border: 2px solid #800000; border-radius: 10px 0 0 10px;">R</span>
                                         <input asp-for="SalePrice" class="form-control" placeholder="0.00" style="border-radius: 0 10px 10px 0; border: 2px solid #e8d9cc; padding: 10px 15px;" />
                                     </div>
-                                    <span asp-validation-for="SalePrice" class="text-danger" style="font-size: 0.85rem;"></span>
+                                    <span asp-validation-for="SalePrice" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label asp-for="DiscountPercentage" class="form-label fw-bold" style="color: #800000;">
-                                        <i class="fas fa-percent me-1"></i> Discount Percentage
-                                    </label>
+                                    <label asp-for="DiscountPercentage" class="form-label fw-bold" style="color: #800000;">Discount Percentage</label>
                                     <div class="input-group">
                                         <input asp-for="DiscountPercentage" class="form-control" placeholder="0" style="border-radius: 10px 0 0 10px; border: 2px solid #e8d9cc; padding: 10px 15px;" />
                                         <span class="input-group-text" style="background: #800000; color: white; border: 2px solid #800000; border-radius: 0 10px 10px 0;">%</span>
                                     </div>
-                                    <span asp-validation-for="DiscountPercentage" class="text-danger" style="font-size: 0.85rem;"></span>
+                                    <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-12">
-                                <label class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-image me-1"></i> Product Image
-                                </label>
+                                <label class="form-label fw-bold" style="color: #800000;">Product Image</label>
                                 <input type="file" name="productImage" class="form-control" accept="image/*" id="imageUpload" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;" />
                                 <small class="form-text text-muted">Upload a high-quality image of your candle. (JPG, PNG, GIF, WEBP)</small>
                                 <div id="imagePreview" class="mt-2" style="display:none;">
@@ -229,9 +206,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label asp-for="RequiredRole" class="form-label fw-bold" style="color: #800000;">
-                                    <i class="fas fa-lock me-1"></i> Access Level
-                                </label>
+                                <label asp-for="RequiredRole" class="form-label fw-bold" style="color: #800000;">Access Level</label>
                                 <select asp-for="RequiredRole" class="form-control" style="border-radius: 10px; border: 2px solid #e8d9cc; padding: 10px 15px;">
                                     <option value="Customer">Everyone (All Customers)</option>
                                     <option value="Admin">Admin Only (Restricted)</option>
@@ -240,7 +215,7 @@
                             </div>
                         </div>
 
-                        <div class="alert mt-4" style="background: rgba(128, 0, 0, 0.05); border: 1px solid rgba(128, 0, 0, 0.15); border-radius: 12px; color: #4a0000;">
+                        <div class="alert mt-3" style="background: rgba(128, 0, 0, 0.05); border: 1px solid rgba(128, 0, 0, 0.15); border-radius: 12px; color: #4a0000;">
                             <i class="fas fa-info-circle" style="color: #800000;"></i>
                             <strong style="color: #800000;"> Tips for creating great candles:</strong>
                             <ul class="mb-0 mt-2" style="color: #4a0000;">

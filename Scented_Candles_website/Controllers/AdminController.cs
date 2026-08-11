@@ -237,13 +237,12 @@ namespace ScentedCandleWebsite.Controllers
         // POST: /Admin/CreateProduct
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateProduct(Product product, IFormFile productImage)
+        public async Task<IActionResult> CreateProduct(Product product, IFormFile? productImage)
         {
-            // Remove model state errors for custom scent handling
-            if (!string.IsNullOrEmpty(product.Scent))
-            {
-                ModelState.Remove("Scent");
-            }
+            // Remove validation for properties that might not be in the form
+            ModelState.Remove("ImageUrl");
+            ModelState.Remove("CreatedAt");
+            ModelState.Remove("Category");
 
             if (ModelState.IsValid)
             {
@@ -267,7 +266,6 @@ namespace ScentedCandleWebsite.Controllers
                         var fileName = Guid.NewGuid().ToString() + fileExtension;
                         var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
 
-                        // Create directory if it doesn't exist
                         if (!Directory.Exists(uploadPath))
                         {
                             Directory.CreateDirectory(uploadPath);
@@ -275,18 +273,15 @@ namespace ScentedCandleWebsite.Controllers
 
                         var filePath = Path.Combine(uploadPath, fileName);
 
-                        // Save file
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
                             await productImage.CopyToAsync(stream);
                         }
 
-                        // Set image URL
                         product.ImageUrl = $"/images/products/{fileName}";
                     }
                     else
                     {
-                        // Set default image if none uploaded
                         product.ImageUrl = "/images/products/default-candle.jpg";
                     }
 
@@ -304,11 +299,9 @@ namespace ScentedCandleWebsite.Controllers
                     if (string.IsNullOrEmpty(product.WaxType))
                         product.WaxType = "Soy Wax";
 
-                    // Add to database
                     _context.Products.Add(product);
                     await _context.SaveChangesAsync();
 
-                    _logger.LogInformation("New product created: {ProductName} by admin", product.Name);
                     TempData["Success"] = $"Candle '{product.Name}' has been created successfully!";
                     return RedirectToAction(nameof(Products));
                 }
@@ -319,116 +312,155 @@ namespace ScentedCandleWebsite.Controllers
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             ViewBag.Categories = await _context.Categories.ToListAsync();
-
-            // Log validation errors
-            var errors = ModelState.Values.SelectMany(v => v.Errors);
-            foreach (var error in errors)
-            {
-                _logger.LogWarning("Validation error: {Error}", error.ErrorMessage);
-            }
-
             return View(product);
         }
 
+        // ===== EDIT PRODUCT =====
         // GET: /Admin/EditProduct/{id}
         [HttpGet]
         public async Task<IActionResult> EditProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (product == null)
             {
                 return NotFound();
             }
-            ViewBag.Categories = _context.Categories.ToList();
+
+            ViewBag.Categories = await _context.Categories.ToListAsync();
             return View(product);
         }
 
         // POST: /Admin/EditProduct
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProduct(int id, Product product, IFormFile productImage)
+        public async Task<IActionResult> EditProduct(int id, Product product, IFormFile? productImage)
         {
             if (id != product.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // Remove validation for properties that might not be in the form
+            ModelState.Remove("ImageUrl");
+            ModelState.Remove("CreatedAt");
+            ModelState.Remove("Category");
+
+            if (!ModelState.IsValid)
             {
-                try
+                ViewBag.Categories = await _context.Categories.ToListAsync();
+                return View(product);
+            }
+
+            try
+            {
+                // Get the existing product from the database
+                var existingProduct = await _context.Products.FindAsync(id);
+
+                if (existingProduct == null)
                 {
-                    // Handle image upload
-                    if (productImage != null && productImage.Length > 0)
+                    return NotFound();
+                }
+
+                // Update all properties
+                existingProduct.Name = product.Name;
+                existingProduct.Description = product.Description;
+                existingProduct.Price = product.Price;
+                existingProduct.StockQuantity = product.StockQuantity;
+                existingProduct.Scent = product.Scent;
+                existingProduct.Color = product.Color;
+                existingProduct.BurnTime = product.BurnTime;
+                existingProduct.WaxType = product.WaxType;
+                existingProduct.Size = product.Size;
+                existingProduct.CategoryId = product.CategoryId;
+                existingProduct.IsActive = product.IsActive;
+                existingProduct.IsFeatured = product.IsFeatured;
+                existingProduct.IsOnSale = product.IsOnSale;
+                existingProduct.SalePrice = product.SalePrice;
+                existingProduct.DiscountPercentage = product.DiscountPercentage;
+                existingProduct.RequiredRole = product.RequiredRole;
+                existingProduct.UpdatedAt = DateTime.UtcNow;
+
+                // Handle image upload
+                if (productImage != null && productImage.Length > 0)
+                {
+                    // Validate image type
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                    var fileExtension = Path.GetExtension(productImage.FileName).ToLower();
+
+                    if (!allowedExtensions.Contains(fileExtension))
                     {
-                        // Generate unique filename
-                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(productImage.FileName);
-                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/products", fileName);
+                        TempData["Error"] = "Invalid file type. Please upload JPG, PNG, GIF, or WEBP images only.";
+                        ViewBag.Categories = await _context.Categories.ToListAsync();
+                        return View(product);
+                    }
 
-                        // Create directory if it doesn't exist
-                        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-
-                        // Delete old image if exists
-                        if (!string.IsNullOrEmpty(product.ImageUrl))
+                    // Delete old image if exists
+                    if (!string.IsNullOrEmpty(existingProduct.ImageUrl))
+                    {
+                        var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot",
+                            existingProduct.ImageUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(oldImagePath))
                         {
-                            var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", product.ImageUrl.TrimStart('/'));
-                            if (System.IO.File.Exists(oldImagePath))
+                            try
                             {
                                 System.IO.File.Delete(oldImagePath);
                             }
+                            catch
+                            {
+                                // Log error but continue
+                            }
                         }
-
-                        // Save new file
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await productImage.CopyToAsync(stream);
-                        }
-
-                        // Update image URL
-                        product.ImageUrl = $"/images/products/{fileName}";
                     }
 
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
-                    TempData["Success"] = $"Candle '{product.Name}' has been updated successfully!";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.Id))
+                    // Save new image
+                    var fileName = Guid.NewGuid().ToString() + fileExtension;
+                    var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+
+                    if (!Directory.Exists(uploadPath))
                     {
-                        return NotFound();
+                        Directory.CreateDirectory(uploadPath);
                     }
+
+                    var filePath = Path.Combine(uploadPath, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await productImage.CopyToAsync(stream);
+                    }
+
+                    existingProduct.ImageUrl = $"/images/products/{fileName}";
+                }
+
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = $"Candle '{existingProduct.Name}' has been updated successfully!";
+                return RedirectToAction(nameof(Products));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(product.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    _logger.LogError("Concurrency error updating product {ProductId}", product.Id);
+                    TempData["Error"] = "The product was modified by another user. Please try again.";
                     throw;
                 }
-                return RedirectToAction(nameof(Products));
             }
-            ViewBag.Categories = _context.Categories.ToList();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating product {ProductId}", product.Id);
+                TempData["Error"] = "An error occurred while updating the product. Please try again.";
+            }
+
+            ViewBag.Categories = await _context.Categories.ToListAsync();
             return View(product);
         }
-
-        // POST: /Admin/BulkDeleteProducts
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> BulkDeleteProducts(int[] productIds)
-        {
-            if (productIds == null || productIds.Length == 0)
-            {
-                TempData["Error"] = "No products selected for deletion.";
-                return RedirectToAction(nameof(Products));
-            }
-
-            var products = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
-            _context.Products.RemoveRange(products);
-            await _context.SaveChangesAsync();
-
-            _logger.LogInformation("Bulk deleted {Count} products", products.Count);
-            TempData["Success"] = $"{products.Count} products have been deleted successfully!";
-
-            return RedirectToAction(nameof(Products));
-        }
-
-        
 
         private bool ProductExists(int id)
         {
