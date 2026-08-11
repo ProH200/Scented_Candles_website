@@ -764,18 +764,34 @@
                     background: #9c7b66;
                 }
 
-        /* ===== FOOTER ===== */
+        /* Footer Styles */
         .footer {
-            padding: 40px 0 20px;
-            border-top: 1px solid rgba(44, 24, 16, 0.08);
+            background: #2c1810;
+            color: #fff;
+            padding: 60px 0 20px;
+            margin-top: 60px;
+        }
+
+            .footer .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 20px;
+            }
+
+        .footer-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
             gap: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        /* Brand Section */
         .footer-brand h3 {
-            font-family: 'Playfair Display', serif;
             font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #fff;
         }
 
             .footer-brand h3 span {
@@ -783,61 +799,138 @@
             }
 
         .footer-brand p {
-            color: #7d6b5e;
-            font-size: 0.95em;
-            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            line-height: 1.8;
             max-width: 300px;
         }
 
-        .footer h4 {
-            font-size: 1em;
-            margin-bottom: 15px;
-        }
-
-        .footer a {
-            display: block;
-            color: #7d6b5e;
-            text-decoration: none;
-            padding: 4px 0;
-            font-size: 0.95em;
-            transition: color 0.3s;
-        }
-
-            .footer a:hover {
-                color: #b99a85;
-            }
-
+        /* Social Icons */
         .footer-social {
             display: flex;
-            gap: 15px;
-            margin-top: 15px;
+            gap: 12px;
+            margin-top: 20px;
         }
 
             .footer-social a {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: #f5eee9;
-                display: flex;
+                display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                color: #2c1810;
+                width: 38px;
+                height: 38px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                color: #fff;
+                transition: all 0.3s ease;
                 text-decoration: none;
-                transition: all 0.3s;
             }
 
                 .footer-social a:hover {
                     background: #b99a85;
-                    color: white;
+                    transform: translateY(-3px);
                 }
 
+        /* Footer Links */
+        .footer-links h4 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 6px 0;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+            .footer-links a:hover {
+                color: #b99a85;
+                padding-left: 5px;
+            }
+
+        /* Footer Bottom */
         .footer-bottom {
-            grid-column: 1 / -1;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding-top: 20px;
-            border-top: 1px solid rgba(44, 24, 16, 0.08);
-            color: #7d6b5e;
-            font-size: 0.9em;
+        }
+
+            .footer-bottom p {
+                color: rgba(255, 255, 255, 0.5);
+                font-size: 14px;
+            }
+
+        .footer-payment {
+            display: flex;
+            gap: 15px;
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+            .footer-payment i {
+                transition: all 0.3s ease;
+                cursor: default;
+            }
+
+                .footer-payment i:hover {
+                    color: rgba(255, 255, 255, 0.7);
+                }
+
+        /* ===== RESPONSIVE ===== */
+        @@media (max-width: 992px) {
+            .footer-grid
+
+        {
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        }
+
+        @@media (max-width: 768px) {
+            .footer
+
+        {
+            padding: 40px 0 20px;
+        }
+
+        .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .footer-brand p {
+            max-width: 100%;
+        }
+
+        .footer-bottom {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        }
+
+        @@media (max-width: 480px) {
+            .footer-social
+
+        {
+            justify-content: center;
+        }
+
+        .footer-links a {
+            text-align: center;
+        }
+
+        .footer-links h4 {
+            text-align: center;
+        }
+
         }
 
         /* ===== RESPONSIVE ===== */
@@ -1115,12 +1208,12 @@
                                         <div class="product-price">
                                             @if (product.IsOnSale && product.SalePrice.HasValue)
                                             {
-                                                <span class="sale-price">R@product.SalePrice.Value.ToString("F2")</span>
-                                                <span class="original">R@product.Price.ToString("F2")</span>
+                                                <span class="sale-price">R @product.SalePrice.Value.ToString("F2")</span>
+                                                <span class="original">R @product.Price.ToString("F2")</span>
                                             }
                                             else
                                             {
-                                                <span>$@product.Price.ToString("F2")</span>
+                                                <span>R @product.Price.ToString("F2")</span>
                                             }
                                         </div>
                                         <button class="btn-quick-add" onclick="addToCart(@product.Id)" title="Add to Cart">
@@ -1174,34 +1267,58 @@
 
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
-            <div class="footer-brand">
-                <h3>Scented<span>Candles</span></h3>
-                <p>Handcrafted soy candles made with love and the finest natural ingredients.</p>
-               
-            </div>
-            <div>
-                <h4>Quick Links</h4>
-                <a href="#">Shop All</a>
-                <a href="#">New Arrivals</a>
-                <a href="#">Best Sellers</a>
-                <a href="#">On Sale</a>
-            </div>
-            <div>
-                <h4>Help</h4>
-                <a href="#">Shipping Info</a>
-                <a href="#">Returns</a>
-                <a href="#">FAQ</a>
-                <a href="#">Contact</a>
-            </div>
-            <div>
-                <h4>About</h4>
-                <a href="#">Our Story</a>
-                <a href="#">Sustainability</a>
-                <a href="#">Careers</a>
-                <a href="#">Blog</a>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; @DateTime.Now.Year Scented Candles. All rights reserved.</p>
+            <div class="container">
+                <div class="footer-grid">
+                    <!-- Brand Section -->
+                    <div class="footer-brand">
+                        <h3>Scented<span>Candles</span></h3>
+                        <p>Handcrafted soy candles made with love and the finest natural ingredients.</p>
+                        <div class="footer-social">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-pinterest"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="footer-links">
+                        <h4>Quick Links</h4>
+                        <a href="#">Shop All</a>
+                        <a href="#">New Arrivals</a>
+                        <a href="#">Best Sellers</a>
+                        <a href="#">On Sale</a>
+                    </div>
+
+                    <!-- Help -->
+                    <div class="footer-links">
+                        <h4>Help</h4>
+                        <a href="#">Shipping Info</a>
+                        <a href="#">Returns</a>
+                        <a href="#">FAQ</a>
+                        <a href="#">Contact</a>
+                    </div>
+
+                    <!-- About -->
+                    <div class="footer-links">
+                        <h4>About</h4>
+                        <a href="#">Our Story</a>
+                        <a href="#">Sustainability</a>
+                        <a href="#">Careers</a>
+                        <a href="#">Blog</a>
+                    </div>
+                </div>
+
+                <!-- Footer Bottom -->
+                <div class="footer-bottom">
+                    <p>&copy; @DateTime.Now.Year Scented Candles. All rights reserved.</p>
+                    <div class="footer-payment">
+                        <i class="fab fa-cc-visa"></i>
+                        <i class="fab fa-cc-mastercard"></i>
+                        <i class="fab fa-cc-paypal"></i>
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                </div>
             </div>
         </footer>
     </div>
