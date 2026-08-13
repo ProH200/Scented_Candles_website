@@ -42,6 +42,10 @@ namespace ScentedCandleWebsite.Models
         [StringLength(20)]
         public string Status { get; set; } = "Pending";
 
+       
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime? DeliveredDate { get; set; }
+
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

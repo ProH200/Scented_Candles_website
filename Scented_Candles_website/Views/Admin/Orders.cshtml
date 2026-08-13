@@ -150,101 +150,27 @@
                                     </span>
                                 </td>
                                 <td style="padding: 12px 8px; vertical-align: middle;">
-                                    <span class="fw-bold" style="color: #800000; font-size: 0.95rem;">@order.TotalAmount.ToString("C")</span>
+                                    <span class="fw-bold" style="color: #800000; font-size: 0.95rem;">R @order.TotalAmount.ToString("F2")</span>
                                 </td>
                                 <td style="padding: 12px 8px; vertical-align: middle;">
-                                    <select class="form-select form-select-sm status-select" data-order-id="@order.Id" onchange="updateOrderStatus(@order.Id, this.value)" style="border-color: #800000; border-radius: 20px; width: 130px; font-size: 0.75rem; padding: 4px 12px;">
-                                        <option value="Pending" selected="@(order.Status == "Pending")">📋 Pending</option>
-                                        <option value="Processing" selected="@(order.Status == "Processing")">⚙️ Processing</option>
-                                        <option value="Shipped" selected="@(order.Status == "Shipped")">🚚 Shipped</option>
-                                        <option value="Delivered" selected="@(order.Status == "Delivered")">✅ Delivered</option>
-                                        <option value="Cancelled" selected="@(order.Status == "Cancelled")">❌ Cancelled</option>
-                                    </select>
+                                    <form asp-action="UpdateOrderStatus" asp-controller="Admin" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to change the order status?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                        <select name="status" class="form-select form-select-sm status-select" onchange="this.form.submit()" style="border-color: #800000; border-radius: 20px; width: 130px; font-size: 0.75rem; padding: 4px 12px;">
+                                            <option value="Pending" selected="@(order.Status == "Pending")">📋 Pending</option>
+                                            <option value="Processing" selected="@(order.Status == "Processing")">⚙️ Processing</option>
+                                            <option value="Shipped" selected="@(order.Status == "Shipped")">🚚 Shipped</option>
+                                            <option value="Delivered" selected="@(order.Status == "Delivered")">✅ Delivered</option>
+                                            <option value="Cancelled" selected="@(order.Status == "Cancelled")">❌ Cancelled</option>
+                                        </select>
+                                    </form>
                                 </td>
                                 <td style="padding: 12px 20px 12px 8px; vertical-align: middle; text-align: center;">
-                                    <button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#orderModal-@order.Id" style="background: #800000; color: white; border: none; border-radius: 8px; padding: 5px 14px; font-size: 0.75rem;">
+                                    <button type="button" class="btn btn-sm btn-view-order" data-orderid="@order.Id" style="background: #800000; color: white; border: none; border-radius: 8px; padding: 5px 14px; font-size: 0.75rem;">
                                         <i class="fas fa-eye"></i> View
                                     </button>
                                 </td>
                             </tr>
-
-                            <!-- Order Details Modal -->
-                            <div class="modal fade" id="orderModal-@order.Id" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog modal-lg modal-dialog-centered">
-                                    <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
-                                        <div class="modal-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; padding: 16px 24px;">
-                                            <h5 class="modal-title">
-                                                <i class="fas fa-receipt me-2"></i> Order #@order.Id Details
-                                            </h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body p-4">
-                                            <div class="row g-3 mb-4">
-                                                <div class="col-md-6">
-                                                    <div class="info-card" style="background: #f8f9fa; padding: 15px; border-radius: 12px; height: 100%;">
-                                                        <h6 style="color: #800000; margin-bottom: 10px; font-weight: 700; font-size: 0.85rem;">
-                                                            <i class="fas fa-user me-2"></i>Customer Information
-                                                        </h6>
-                                                        <p class="mb-1" style="font-size: 0.85rem;"><strong>Name:</strong> @order.User?.FirstName @order.User?.LastName</p>
-                                                        <p class="mb-1" style="font-size: 0.85rem;"><strong>Email:</strong> @order.User?.Email</p>
-                                                        <p class="mb-0" style="font-size: 0.85rem;"><strong>Phone:</strong> @order.PhoneNumber</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="info-card" style="background: #f8f9fa; padding: 15px; border-radius: 12px; height: 100%;">
-                                                        <h6 style="color: #800000; margin-bottom: 10px; font-weight: 700; font-size: 0.85rem;">
-                                                            <i class="fas fa-truck me-2"></i>Shipping Address
-                                                        </h6>
-                                                        <p class="mb-1" style="font-size: 0.85rem;">@order.ShippingAddress</p>
-                                                        <p class="mb-1" style="font-size: 0.85rem;">@order.City, @order.PostalCode</p>
-                                                        <p class="mb-0" style="font-size: 0.85rem;">@order.Country</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <h6 style="color: #800000; margin-bottom: 12px; font-weight: 700; font-size: 0.9rem;">
-                                                <i class="fas fa-box me-2"></i>Order Items
-                                            </h6>
-                                            <div class="table-responsive">
-                                                <table class="table table-sm" style="border-radius: 12px; overflow: hidden; font-size: 0.85rem;">
-                                                    <thead style="background: #800000; color: white;">
-                                                        <tr>
-                                                            <th style="padding: 10px 15px;">Product</th>
-                                                            <th style="padding: 10px 15px;">Quantity</th>
-                                                            <th style="padding: 10px 15px;">Price</th>
-                                                            <th style="padding: 10px 15px;">Subtotal</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach (var item in order.OrderItems)
-                                                        {
-                                                            <tr>
-                                                                <td style="padding: 10px 15px;">@item.Product?.Name</td>
-                                                                <td style="padding: 10px 15px;">@item.Quantity</td>
-                                                                <td style="padding: 10px 15px;">@item.Price.ToString("C")</td>
-                                                                <td style="padding: 10px 15px; font-weight: 600; color: #800000;">@((item.Quantity * item.Price).ToString("C"))</td>
-                                                            </tr>
-                                                        }
-                                                    </tbody>
-                                                    <tfoot style="background: #f8f9fa; font-weight: 700;">
-                                                        <tr>
-                                                            <th colspan="3" class="text-end" style="padding: 10px 15px;">Total:</th>
-                                                            <th style="padding: 10px 15px; color: #800000; font-size: 1.1rem;">@order.TotalAmount.ToString("C")</th>
-                                                        </tr>
-                                                    </tfoot>
-                                                </table>
-                                            </div>
-                                            <div class="alert mt-3" style="background: rgba(128, 0, 0, 0.05); border: none; border-left: 3px solid #800000; border-radius: 12px; padding: 12px 16px; font-size: 0.85rem;">
-                                                <i class="fas fa-calendar me-2" style="color: #800000;"></i>
-                                                Order placed on @order.OrderDate.ToString("MMMM dd, yyyy hh:mm tt")
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer" style="border-top: none; padding: 16px 24px;">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 8px 24px;">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         }
                     </tbody>
                 </table>
@@ -253,8 +179,32 @@
     </div>
 </div>
 
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; padding: 16px 24px;">
+                <h5 class="modal-title">
+                    <i class="fas fa-receipt me-2"></i> <span id="modalOrderTitle">Order Details</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4" id="modalOrderBody">
+                <div class="text-center py-4">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 30px; color: #800000;"></i>
+                    <p class="mt-2">Loading order details...</p>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: none; padding: 16px 24px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 8px 24px;">
+                    <i class="fas fa-times me-1"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-    /* Table Styling */
     .table {
         vertical-align: middle;
         font-size: 0.85rem;
@@ -265,7 +215,6 @@
         transition: all 0.3s ease;
     }
 
-    /* Status Select Styling */
     .status-select {
         cursor: pointer;
         transition: all 0.3s ease;
@@ -282,7 +231,6 @@
             box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
         }
 
-    /* Button Hover Effects */
     .btn {
         transition: all 0.3s ease;
     }
@@ -292,7 +240,6 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-    /* Card Animation */
     .card {
         animation: fadeInUp 0.5s ease-out;
     }
@@ -309,7 +256,6 @@
         }
     }
 
-    /* Statistics Card Hover */
     .card {
         transition: all 0.3s ease;
     }
@@ -319,7 +265,6 @@
             box-shadow: 0 10px 25px rgba(128, 0, 0, 0.08) !important;
         }
 
-    /* Modal Animation */
     .modal-content {
         animation: modalFadeIn 0.3s ease-out;
     }
@@ -336,7 +281,6 @@
         }
     }
 
-    /* DataTables Styling */
     .dataTables_wrapper .dataTables_length,
     .dataTables_wrapper .dataTables_filter {
         padding: 15px 20px;
@@ -393,7 +337,6 @@
         color: #7d6b5e !important;
     }
 
-    /* Scrollbar Styling */
     .table-responsive::-webkit-scrollbar {
         height: 8px;
     }
@@ -412,7 +355,45 @@
             background: #5a0000;
         }
 
-    /* Responsive Adjustments */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 12px;
+        z-index: 9999;
+        font-weight: 500;
+        max-width: 400px;
+        animation: slideInRight 0.5s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .notification-success {
+        background: #d4edda;
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+
+    .notification-error {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+
+    @@keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
     @@media (max-width: 992px) {
         .table-responsive {
             font-size: 0.8rem;
@@ -474,58 +455,8 @@
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 
     <script>
-        function updateOrderStatus(orderId, status) {
-            if (confirm('Are you sure you want to change the order status to ' + status + '?')) {
-                const select = event.target;
-                const originalValue = select.value;
-                select.disabled = true;
-
-                $.ajax({
-                    url: '@Url.Action("UpdateOrderStatus", "Admin")',
-                    type: 'POST',
-                    data: {
-                        orderId: orderId,
-                        status: status,
-                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            showNotification('Order status updated successfully!', 'success');
-                            setTimeout(function () {
-                                location.reload();
-                            }, 1000);
-                        } else {
-                            alert('Error updating order status');
-                            select.value = originalValue;
-                            select.disabled = false;
-                        }
-                    },
-                    error: function () {
-                        alert('Error updating order status');
-                        select.value = originalValue;
-                        select.disabled = false;
-                    }
-                });
-            } else {
-                const select = event.target;
-                const originalStatus = '@@order.Status';
-                select.value = originalStatus;
-            }
-        }
-
-        function showNotification(message, type) {
-            const notification = $(`
-                        <div class="alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index: 9999; min-width: 300px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); border-radius: 12px;">
-                            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
-                            ${message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    `);
-            $('body').append(notification);
-            setTimeout(() => notification.fadeOut('slow', () => notification.remove()), 3000);
-        }
-
         $(document).ready(function () {
+            // Initialize DataTable
             $('#ordersTable').DataTable({
                 "order": [[2, "desc"]],
                 "pageLength": 10,
@@ -544,9 +475,65 @@
                     }
                 },
                 "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-                    '<"row"<"col-sm-12"tr>>' +
-                    '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
+                       '<"row"<"col-sm-12"tr>>' +
+                       '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
+            });
+
+            // View Order - using AJAX to avoid Bootstrap modal conflicts
+            $('.btn-view-order').on('click', function() {
+                var orderId = $(this).data('orderid');
+
+                // Show loading
+                $('#modalOrderTitle').text('Loading Order #' + orderId + '...');
+                $('#modalOrderBody').html(`
+                    <div class="text-center py-4">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 30px; color: #800000;"></i>
+                        <p class="mt-2">Loading order details...</p>
+                    </div>
+                `);
+
+                // Show modal
+                $('#orderDetailsModal').modal('show');
+
+                // Fetch order details via AJAX
+                $.ajax({
+                    url: '@Url.Action("GetOrderDetails", "Admin")',
+                    type: 'GET',
+                    data: { id: orderId },
+                    success: function(response) {
+                        $('#modalOrderTitle').text('Order #' + orderId + ' Details');
+                        $('#modalOrderBody').html(response);
+                    },
+                    error: function() {
+                        $('#modalOrderTitle').text('Error');
+                        $('#modalOrderBody').html(`
+                            <div class="text-center py-4">
+                                <i class="fas fa-exclamation-circle" style="font-size: 30px; color: #dc3545;"></i>
+                                <p class="mt-2">Error loading order details. Please try again.</p>
+                            </div>
+                        `);
+                    }
+                });
             });
         });
+
+        // Show notification function
+        function showNotification(message, type) {
+            var notification = $(`
+                <div class="notification notification-${type}">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    <span>${message}</span>
+                    <button type="button" class="btn-close" onclick="$(this).closest('.notification').remove()"></button>
+                </div>
+            `);
+
+            $('body').append(notification);
+
+            setTimeout(function() {
+                notification.fadeOut('slow', function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        }
     </script>
 }

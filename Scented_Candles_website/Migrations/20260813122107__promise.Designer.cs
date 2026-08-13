@@ -12,7 +12,7 @@ using ScentedCandleWebsite.Data;
 namespace Scented_Candles_website.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260811135800__promise")]
+    [Migration("20260813122107__promise")]
     partial class _promise
     {
         /// <inheritdoc />
@@ -340,6 +340,9 @@ namespace Scented_Candles_website.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTime?>("DeliveredDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
@@ -364,6 +367,9 @@ namespace Scented_Candles_website.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()

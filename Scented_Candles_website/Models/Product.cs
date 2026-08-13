@@ -111,19 +111,19 @@ namespace ScentedCandleWebsite.Models
         // These are NOT stored in the database
         // [NotMapped] tells Entity Framework to ignore these when creating tables
 
-        
+        [NotMapped]
         [Display(Name = "Current Price")]
         public decimal CurrentPrice => IsOnSale && SalePrice.HasValue ? SalePrice.Value : Price;
 
-        
+        [NotMapped]
         [Display(Name = "Savings")]
         public decimal Savings => IsOnSale && SalePrice.HasValue ? Price - SalePrice.Value : 0;
 
-        
+        [NotMapped]
         [Display(Name = "In Stock")]
         public bool InStock => IsActive && StockQuantity > 0;
 
-        
+        [NotMapped]
         [Display(Name = "Low Stock")]
         public bool LowStock => InStock && StockQuantity < 10;
     }

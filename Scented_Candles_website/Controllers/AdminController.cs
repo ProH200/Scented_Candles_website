@@ -226,6 +226,8 @@ namespace ScentedCandleWebsite.Controllers
             return View(orders);
         }
 
+       
+
         // GET: /Admin/CreateProduct
         [HttpGet]
         public IActionResult CreateProduct()
@@ -486,7 +488,147 @@ namespace ScentedCandleWebsite.Controllers
             return RedirectToAction(nameof(Products));
         }
 
+        // POST: /Admin/UpdateOrderStatus
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateOrderStatus(int orderId, string status)
+        {
+            try
+            {
+                var order = await _context.Orders.FindAsync(orderId);
+                if (order == null)
+                {
+                    return Json(new { success = false, message = "Order not found." });
+                }
 
-        
+                // Validate status
+                var validStatuses = new[] { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" };
+                if (!validStatuses.Contains(status))
+                {
+                    return Json(new { success = false, message = "Invalid status." });
+                }
+
+                // Update order
+                order.Status = status;
+                order.UpdatedAt = DateTime.UtcNow;
+
+                if (status == "Delivered")
+                {
+                    order.DeliveredDate = DateTime.UtcNow;
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = $"Order #{orderId} status updated to {status}." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating order status");
+                return Json(new { success = false, message = "Error updating order status: " + ex.Message });
+            }
+        }
+
+        // GET: /Admin/GetOrderDetails
+        [HttpGet]
+        public async Task<IActionResult> GetOrderDetails(int id)
+        {
+            var order = await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+            {
+                // Return HTML for "Order not found" message
+                return Content("<div class='text-center py-4'><i class='fas fa-exclamation-circle' style='font-size: 30px; color: #dc3545;'></i><p class='mt-2'>Order not found.</p></div>", "text/html");
+            }
+
+            // Build HTML for the modal body
+            var html = $@"
+        <div class='row g-3 mb-4'>
+            <div class='col-md-6'>
+                <div class='info-card' style='background: #f8f9fa; padding: 15px; border-radius: 12px; height: 100%;'>
+                    <h6 style='color: #800000; margin-bottom: 10px; font-weight: 700; font-size: 0.85rem;'>
+                        <i class='fas fa-user me-2'></i>Customer Information
+                    </h6>
+                    <p class='mb-1' style='font-size: 0.85rem;'><strong>Name:</strong> {order.User?.FirstName} {order.User?.LastName}</p>
+                    <p class='mb-1' style='font-size: 0.85rem;'><strong>Email:</strong> {order.User?.Email}</p>
+                    <p class='mb-0' style='font-size: 0.85rem;'><strong>Phone:</strong> {order.PhoneNumber}</p>
+                    <p class='mb-0 mt-2' style='font-size: 0.85rem;'><strong>Status:</strong> <span class='badge' style='background: #800000; color: white;'>{order.Status}</span></p>
+                </div>
+            </div>
+            <div class='col-md-6'>
+                <div class='info-card' style='background: #f8f9fa; padding: 15px; border-radius: 12px; height: 100%;'>
+                    <h6 style='color: #800000; margin-bottom: 10px; font-weight: 700; font-size: 0.85rem;'>
+                        <i class='fas fa-truck me-2'></i>Shipping Address
+                    </h6>
+                    <p class='mb-1' style='font-size: 0.85rem;'>{order.ShippingAddress}</p>
+                    <p class='mb-1' style='font-size: 0.85rem;'>{order.City}, {order.PostalCode}</p>
+                    <p class='mb-0' style='font-size: 0.85rem;'>{order.Country}</p>
+                    <p class='mb-0 mt-2' style='font-size: 0.85rem;'><strong>Order Date:</strong> {order.OrderDate.ToString("MMM dd, yyyy hh:mm tt")}</p>
+                </div>
+            </div>
+        </div>
+
+        <h6 style='color: #800000; margin-bottom: 12px; font-weight: 700; font-size: 0.9rem;'>
+            <i class='fas fa-box me-2'></i>Order Items
+        </h6>
+        <div class='table-responsive'>
+            <table class='table table-sm' style='border-radius: 12px; overflow: hidden; font-size: 0.85rem;'>
+                <thead style='background: #800000; color: white;'>
+                    <tr>
+                        <th style='padding: 10px 15px;'>Product</th>
+                        <th style='padding: 10px 15px;'>Quantity</th>
+                        <th style='padding: 10px 15px;'>Price</th>
+                        <th style='padding: 10px 15px;'>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>";
+
+            foreach (var item in order.OrderItems)
+            {
+                html += $@"
+                    <tr>
+                        <td style='padding: 10px 15px;'>{item.Product?.Name}</td>
+                        <td style='padding: 10px 15px;'>{item.Quantity}</td>
+                        <td style='padding: 10px 15px;'>R {item.Price.ToString("F2")}</td>
+                        <td style='padding: 10px 15px; font-weight: 600; color: #800000;'>R {(item.Quantity * item.Price).ToString("F2")}</td>
+                    </tr>";
+            }
+
+            html += $@"
+                </tbody>
+                <tfoot style='background: #f8f9fa; font-weight: 700;'>
+                    <tr>
+                        <th colspan='3' class='text-end' style='padding: 10px 15px;'>Total:</th>
+                        <th style='padding: 10px 15px; color: #800000; font-size: 1.1rem;'>R {order.TotalAmount.ToString("F2")}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class='alert mt-3' style='background: rgba(128, 0, 0, 0.05); border: none; border-left: 3px solid #800000; border-radius: 12px; padding: 12px 16px; font-size: 0.85rem;'>
+            <i class='fas fa-calendar me-2' style='color: #800000;'></i>
+            Order placed on {order.OrderDate.ToString("MMMM dd, yyyy hh:mm tt")}";
+
+            if (order.UpdatedAt.HasValue)
+            {
+                html += $@"<br />
+            <i class='fas fa-clock me-2' style='color: #800000;'></i>
+            Last updated: {order.UpdatedAt.Value.ToString("MMMM dd, yyyy hh:mm tt")}";
+            }
+
+            if (order.DeliveredDate.HasValue)
+            {
+                html += $@"<br />
+            <i class='fas fa-check-circle me-2' style='color: #28a745;'></i>
+            Delivered on: {order.DeliveredDate.Value.ToString("MMMM dd, yyyy hh:mm tt")}";
+            }
+
+            html += @"</div>";
+
+            // Return the HTML content
+            return Content(html, "text/html");
+        }
     }
 }

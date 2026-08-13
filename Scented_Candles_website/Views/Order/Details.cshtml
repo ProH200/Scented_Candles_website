@@ -2,350 +2,157 @@
 
 @{
     ViewData["Title"] = "Order Details #" + Model.Id;
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"] - Scented Candles</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #faf7f2;
-            color: #2c1810;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 40px 24px;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #800000;
-            text-decoration: none;
-            margin-bottom: 25px;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-            .back-link:hover {
-                color: #5a0000;
-            }
-
-        .order-details-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
-            overflow: hidden;
-        }
-
-        .order-details-header {
-            padding: 24px 30px;
-            background: #800000;
-            color: white;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-            .order-details-header h1 {
-                font-size: 1.5em;
-                font-weight: 700;
-            }
-
-        .order-status-badge {
-            padding: 6px 18px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-pending {
-            background: #fff3e0;
-            color: #e65100;
-        }
-
-        .status-processing {
-            background: #e3f2fd;
-            color: #0d47a1;
-        }
-
-        .status-shipped {
-            background: #e8eaf6;
-            color: #283593;
-        }
-
-        .status-delivered {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .status-cancelled {
-            background: #ffebee;
-            color: #c62828;
-        }
-
-        .order-details-body {
-            padding: 30px;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .info-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-        }
-
-            .info-section h3 {
-                color: #800000;
-                font-size: 1em;
-                margin-bottom: 12px;
-            }
-
-            .info-section p {
-                margin-bottom: 5px;
-                font-size: 0.95em;
-            }
-
-            .info-section strong {
-                color: #2c1810;
-            }
-
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-            .items-table th {
-                background: #800000;
-                color: white;
-                padding: 12px 15px;
-                text-align: left;
-                font-weight: 600;
-            }
-
-            .items-table td {
-                padding: 12px 15px;
-                border-bottom: 1px solid #f0e4d8;
-            }
-
-            .items-table tr:hover td {
-                background: #faf7f2;
-            }
-
-            .items-table .total-row {
-                background: #f8f9fa;
-                font-weight: 700;
-            }
-
-                .items-table .total-row td {
-                    border-bottom: none;
-                    padding: 15px;
-                }
-
-        .order-summary {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-            .order-summary .total {
-                font-size: 1.8em;
-                font-weight: 700;
-                color: #800000;
-            }
-
-        .btn-back {
-            padding: 10px 25px;
-            background: #800000;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-            .btn-back:hover {
-                background: #5a0000;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(128, 0, 0, 0.3);
-            }
-
-        @@media (max-width: 768px) {
-            .container {
-                padding: 20px 16px;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .order-details-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-                padding: 16px 20px;
-            }
-
-            .order-details-body {
-                padding: 16px 20px;
-            }
-
-            .order-summary {
-                flex-direction: column;
-                gap: 15px;
-                align-items: stretch;
-            }
-
-            .btn-back {
-                text-align: center;
-            }
-        }
-
-        @@media (max-width: 480px) {
-            .items-table th,
-            .items-table td {
-                padding: 8px 10px;
-                font-size: 0.85em;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a asp-action="History" class="back-link">
-            <i class="fas fa-arrow-left"></i> Back to Order History
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2" style="color: #800000;">
+            <i class="fas fa-receipt me-2"></i>Order #@Model.Id
+        </h1>
+        <a asp-action="History" class="btn" style="background: #800000; color: white; border-radius: 10px; padding: 8px 20px;">
+            <i class="fas fa-arrow-left me-1"></i> Back to History
         </a>
+    </div>
 
-        <div class="order-details-card">
-            <!-- Header -->
-            <div class="order-details-header">
-                <h1><i class="fas fa-receipt"></i> Order #@Model.Id</h1>
-                <span class="order-status-badge status-@Model.Status?.ToLower()">
-                    @{
-                        var statusIcons = new Dictionary<string, string>
-                    {
-                    { "Pending", "📋" },
-                    { "Processing", "⚙️" },
-                    { "Shipped", "🚚" },
-                    { "Delivered", "✅" },
-                    { "Cancelled", "❌" }
-                    };
-                    }
-                    @(statusIcons.ContainsKey(Model.Status) ? statusIcons[Model.Status] : "📦")
-                    @Model.Status
-                </span>
+    <div class="card shadow-sm border-0" style="border-radius: 16px; overflow: hidden;">
+        <div class="card-header" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%); color: white; border: none; padding: 20px 25px;">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shopping-cart me-2"></i> Order Details
+                    </h5>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span class="badge" style="background: rgba(255,255,255,0.2); padding: 6px 20px; font-size: 0.85rem; border-radius: 20px;">
+                        @Model.Status
+                    </span>
+                    <span class="ms-2" style="font-size: 1.1rem;">R @Model.TotalAmount.ToString("F2")</span>
+                </div>
             </div>
+        </div>
 
-            <!-- Body -->
-            <div class="order-details-body">
-                <!-- Customer & Shipping Info -->
-                <div class="info-grid">
-                    <div class="info-section">
-                        <h3><i class="fas fa-user"></i> Customer Information</h3>
-                        <p><strong>Name:</strong> @Model.User?.FirstName @Model.User?.LastName</p>
-                        <p><strong>Email:</strong> @Model.User?.Email</p>
-                        <p><strong>Phone:</strong> @Model.PhoneNumber</p>
-                    </div>
-                    <div class="info-section">
-                        <h3><i class="fas fa-truck"></i> Shipping Address</h3>
-                        <p>@Model.ShippingAddress</p>
-                        <p>@Model.City, @Model.PostalCode</p>
-                        <p>@Model.Country</p>
-                        <p><strong>Order Date:</strong> @Model.OrderDate.ToString("MMM dd, yyyy hh:mm tt")</p>
+        <div class="card-body p-4">
+            <!-- Customer & Shipping Info -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="p-3" style="background: #f8f9fa; border-radius: 12px; height: 100%;">
+                        <h6 style="color: #800000; font-weight: 700; margin-bottom: 12px;">
+                            <i class="fas fa-user me-2"></i>Customer Information
+                        </h6>
+                        <p class="mb-1"><strong>Name:</strong> @Model.User?.FirstName @Model.User?.LastName</p>
+                        <p class="mb-1"><strong>Email:</strong> @Model.User?.Email</p>
+                        <p class="mb-0"><strong>Phone:</strong> @Model.PhoneNumber</p>
+                        <p class="mb-0 mt-2"><strong>Order Date:</strong> @Model.OrderDate.ToString("MMMM dd, yyyy hh:mm tt")</p>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="p-3" style="background: #f8f9fa; border-radius: 12px; height: 100%;">
+                        <h6 style="color: #800000; font-weight: 700; margin-bottom: 12px;">
+                            <i class="fas fa-truck me-2"></i>Shipping Address
+                        </h6>
+                        <p class="mb-1">@Model.ShippingAddress</p>
+                        <p class="mb-1">@Model.City, @Model.PostalCode</p>
+                        <p class="mb-0">@Model.Country</p>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Order Items -->
-                <h3 style="color: #800000; margin: 20px 0 15px;">
-                    <i class="fas fa-box"></i> Order Items
-                </h3>
-                <table class="items-table">
-                    <thead>
+            <!-- Order Items -->
+            <h6 style="color: #800000; font-weight: 700; margin-bottom: 15px;">
+                <i class="fas fa-box me-2"></i>Order Items
+            </h6>
+            <div class="table-responsive">
+                <table class="table table-hover" style="border-radius: 12px; overflow: hidden;">
+                    <thead style="background: #800000; color: white;">
                         <tr>
-                            <th>Product</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Subtotal</th>
+                            <th style="padding: 12px 15px;">Product</th>
+                            <th style="padding: 12px 15px;">Quantity</th>
+                            <th style="padding: 12px 15px;">Price</th>
+                            <th style="padding: 12px 15px;">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model.OrderItems)
                         {
                             <tr>
-                                <td>@item.Product?.Name</td>
-                                <td>@item.Quantity</td>
-                                <td>@item.Price.ToString("C")</td>
-                                <td>@((item.Quantity * item.Price).ToString("C"))</td>
+                                <td style="padding: 12px 15px;">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@(item.Product?.ImageUrl ?? "/images/default-candle.jpg")" alt="@item.Product?.Name"
+                                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 12px;"
+                                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1603006905003-be475563bc59?w=50&h=50&fit=crop'">
+                                        <span style="font-weight: 500;">@item.Product?.Name</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 12px 15px;">@item.Quantity</td>
+                                <td style="padding: 12px 15px;">R @item.Price.ToString("F2")</td>
+                                <td style="padding: 12px 15px; font-weight: 600; color: #800000;">R @((item.Quantity * item.Price).ToString("F2"))</td>
                             </tr>
                         }
-                        <tr class="total-row">
-                            <td colspan="3" style="text-align: right;">Total:</td>
-                            <td style="color: #800000; font-size: 1.2em;">@Model.TotalAmount.ToString("C")</td>
-                        </tr>
                     </tbody>
+                    <tfoot style="background: #f8f9fa; font-weight: 700;">
+                        <tr>
+                            <td colspan="3" class="text-end" style="padding: 12px 15px;">Total:</td>
+                            <td style="padding: 12px 15px; color: #800000; font-size: 1.1rem;">R @Model.TotalAmount.ToString("F2")</td>
+                        </tr>
+                    </tfoot>
                 </table>
+            </div>
 
-                <!-- Order Summary -->
-                <div class="order-summary">
-                    <div>
-                        <div style="font-weight: 600; color: #2c1810;">Order Summary</div>
-                        <div style="color: #7d6b5e; font-size: 0.9em;">
-                            @Model.OrderItems.Count items ·
-                            @if (Model.OrderDate.AddDays(7) > DateTime.Now && Model.Status != "Delivered" && Model.Status != "Cancelled")
-                            {
-                                <span style="color: #e65100;">Expected delivery: @Model.OrderDate.AddDays(7).ToString("MMM dd, yyyy")</span>
-                            }
-                            else
-                            {
-                                <span>Order completed</span>
-                            }
+            <!-- Order Status Timeline -->
+            <div class="mt-4 p-3" style="background: #f8f9fa; border-radius: 12px;">
+                <h6 style="color: #800000; font-weight: 700; margin-bottom: 12px;">
+                    <i class="fas fa-clock me-2"></i>Order Status
+                </h6>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle p-2" style="background: #28a745; width: 10px; height: 10px;"></div>
+                        <span class="ms-2" style="font-size: 0.9rem;">Order Placed</span>
+                    </div>
+                    @if (Model.Status == "Processing" || Model.Status == "Shipped" || Model.Status == "Delivered")
+                    {
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle p-2" style="background: #28a745; width: 10px; height: 10px;"></div>
+                            <span class="ms-2" style="font-size: 0.9rem;">Processing</span>
                         </div>
-                    </div>
-                    <div>
-                        <span class="total">@Model.TotalAmount.ToString("C")</span>
-                    </div>
-                </div>
-
-                <div style="margin-top: 20px; text-align: right;">
-                    <a asp-action="History" class="btn-back">
-                        <i class="fas fa-arrow-left"></i> Back to History
-                    </a>
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle p-2" style="background: #e8d9cc; width: 10px; height: 10px;"></div>
+                            <span class="ms-2 text-muted" style="font-size: 0.9rem;">Processing</span>
+                        </div>
+                    }
+                    @if (Model.Status == "Shipped" || Model.Status == "Delivered")
+                    {
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle p-2" style="background: #28a745; width: 10px; height: 10px;"></div>
+                            <span class="ms-2" style="font-size: 0.9rem;">Shipped</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle p-2" style="background: #e8d9cc; width: 10px; height: 10px;"></div>
+                            <span class="ms-2 text-muted" style="font-size: 0.9rem;">Shipped</span>
+                        </div>
+                    }
+                    @if (Model.Status == "Delivered")
+                    {
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle p-2" style="background: #28a745; width: 10px; height: 10px;"></div>
+                            <span class="ms-2" style="font-size: 0.9rem;">Delivered</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle p-2" style="background: #e8d9cc; width: 10px; height: 10px;"></div>
+                            <span class="ms-2 text-muted" style="font-size: 0.9rem;">Delivered</span>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
-</body>
-</html>
+</div>
