@@ -141,7 +141,7 @@
                         </div>
 
                         <!-- Free Shipping Info -->
-                        @if (subtotal < 100)
+                        @if (subtotal > 200)
                         {
                             <div class="alert alert-info small mt-3" style="background: rgba(128, 0, 0, 0.05); border: none; border-left: 3px solid #800000; border-radius: 12px;">
                                 <i class="fas fa-truck me-2" style="color: #800000;"></i>
@@ -271,68 +271,313 @@
 
 @section Scripts {
     <script>
-        function updateQuantity(cartItemId, newQuantity) {
-            newQuantity = parseInt(newQuantity);
-            if (isNaN(newQuantity) || newQuantity < 1) {
-                newQuantity = 1;
-            }
+    // ===== UPDATE QUANTITY =====
+    function updateQuantity(cartItemId, newQuantity) {
+        // Validate quantity
+        newQuantity = parseInt(newQuantity);
+        if (isNaN(newQuantity) || newQuantity < 1) {
+            newQuantity = 1;
+        }
 
-            // Show loading state on quantity buttons
-            const buttons = $(`#cart-item-${cartItemId} .btn`);
-            buttons.prop('disabled', true);
+        // Show loading state on quantity buttons
+        const buttons = $(`#cart-item-${cartItemId} .btn`);
+        buttons.prop('disabled', true);
+        
+        // Show loading on the quantity input
+        const input = $(`#cart-item-${cartItemId} .quantity-input`);
+        input.css('opacity', '0.5');
 
-            $.ajax({
-                url: '@Url.Action("UpdateQuantity", "Cart")',
-                type: 'POST',
-                data: {
-                    cartItemId: cartItemId,
-                    quantity: newQuantity,
-                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                },
-                success: function (response) {
-                    if (response.success) {
+        // Get anti-forgery token
+        const token = document.querySelector('input[name="__RequestVerificationToken"]');
+        const tokenValue = token ? token.value : '';
+
+        $.ajax({
+            url: '@Url.Action("UpdateQuantity", "Cart")',
+            type: 'POST',
+            data: {
+                cartItemId: cartItemId,
+                quantity: newQuantity,
+                __RequestVerificationToken: tokenValue
+            },
+            success: function (response) {
+                if (response.success) {
+                    // Show success notification
+                    showNotification('Cart updated successfully!', 'success');
+                    
+                    // Reload after a moment to show updated cart
+                    setTimeout(function () {
                         location.reload();
-                    } else {
-                        alert(response.message);
-                        buttons.prop('disabled', false);
-                    }
-                },
-                error: function () {
-                    alert('Error updating cart');
+                    }, 1000);
+                } else {
+                    showNotification(response.message || 'Error updating cart', 'error');
                     buttons.prop('disabled', false);
+                    input.css('opacity', '1');
                 }
-            });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+                showNotification('Error updating cart. Please try again.', 'error');
+                buttons.prop('disabled', false);
+                input.css('opacity', '1');
+            }
+        });
+    }
+
+    // ===== REMOVE ITEM =====
+    function removeItem(cartItemId) {
+        if (!confirm('Remove this item from your cart?')) {
+            return;
         }
 
-        function removeItem(cartItemId) {
-            if (confirm('Remove this item from cart?')) {
-                // Show loading state on remove button
-                const button = $(`#cart-item-${cartItemId} .btn-danger`);
-                button.html('<i class="fas fa-spinner fa-spin"></i>');
-                button.prop('disabled', true);
+        // Show loading state on remove button
+        const button = $(`#cart-item-${cartItemId} .btn-danger`);
+        const originalText = button.html();
+        button.html('<i class="fas fa-spinner fa-spin"></i>');
+        button.prop('disabled', true);
 
-                $.ajax({
-                    url: '@Url.Action("RemoveItem", "Cart")',
-                    type: 'POST',
-                    data: {
-                        cartItemId: cartItemId,
-                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                    },
-                    success: function () {
+        // Get anti-forgery token
+        const token = document.querySelector('input[name="__RequestVerificationToken"]');
+        const tokenValue = token ? token.value : '';
+
+        $.ajax({
+            url: '@Url.Action("RemoveItem", "Cart")',
+            type: 'POST',
+            data: {
+                cartItemId: cartItemId,
+                __RequestVerificationToken: tokenValue
+            },
+            success: function (response) {
+                if (response.success) {
+                    showNotification('Item removed from cart.', 'success');
+                    
+                    // Remove the item row with animation
+                    $(`#cart-item-${cartItemId}`).fadeOut('slow', function() {
+                        // Check if cart is empty
+                        if ($('#cart-items-container .cart-item').length === 1) {
+                            location.reload();
+                        } else {
+                            // Update totals
+                            if (response.cartCount !== undefined) {
+                                updateCartBadge(response.cartCount);
+                            }
+                            location.reload();
+                        }
+                    });
+                } else {
+                    showNotification(response.message || 'Error removing item', 'error');
+                    button.html(originalText);
+                    button.prop('disabled', false);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+                showNotification('Error removing item. Please try again.', 'error');
+                button.html(originalText);
+                button.prop('disabled', false);
+            }
+        });
+    }
+
+    // ===== CLEAR CART =====
+    function clearCart() {
+        if (!confirm('Are you sure you want to clear your entire cart?')) {
+            return;
+        }
+
+        const button = $('#clearCartBtn');
+        const originalText = button.html();
+        button.html('<i class="fas fa-spinner fa-spin"></i> Clearing...');
+        button.prop('disabled', true);
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]');
+        const tokenValue = token ? token.value : '';
+
+        $.ajax({
+            url: '@Url.Action("ClearCart", "Cart")',
+            type: 'POST',
+            data: {
+                __RequestVerificationToken: tokenValue
+            },
+            success: function (response) {
+                if (response.success) {
+                    showNotification('Cart cleared successfully.', 'success');
+                    setTimeout(function () {
                         location.reload();
-                    },
-                    error: function () {
-                        alert('Error removing item');
-                        button.html('<i class="fas fa-trash-alt"></i>');
-                        button.prop('disabled', false);
-                    }
-                });
+                    }, 1000);
+                } else {
+                    showNotification(response.message || 'Error clearing cart', 'error');
+                    button.html(originalText);
+                    button.prop('disabled', false);
+                }
+            },
+            error: function () {
+                showNotification('Error clearing cart. Please try again.', 'error');
+                button.html(originalText);
+                button.prop('disabled', false);
+            }
+        });
+    }
+
+    // ===== APPLY COUPON =====
+    function applyCoupon() {
+        const couponCode = $('#couponCode').val().trim();
+        
+        if (!couponCode) {
+            showNotification('Please enter a coupon code.', 'info');
+            return;
+        }
+
+        const button = $('#applyCouponBtn');
+        const originalText = button.html();
+        button.html('<i class="fas fa-spinner fa-spin"></i> Applying...');
+        button.prop('disabled', true);
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]');
+        const tokenValue = token ? token.value : '';
+
+        $.ajax({
+            url: '@Url.Action("ApplyCoupon", "Cart")',
+            type: 'POST',
+            data: {
+                couponCode: couponCode,
+                __RequestVerificationToken: tokenValue
+            },
+            success: function (response) {
+                if (response.success) {
+                    showNotification(response.message || 'Coupon applied successfully!', 'success');
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showNotification(response.message || 'Invalid coupon code.', 'error');
+                    button.html(originalText);
+                    button.prop('disabled', false);
+                }
+            },
+            error: function () {
+                showNotification('Error applying coupon. Please try again.', 'error');
+                button.html(originalText);
+                button.prop('disabled', false);
+            }
+        });
+    }
+
+    // ===== UPDATE CART BADGE =====
+    function updateCartBadge(count) {
+        const badge = document.querySelector('.cart-badge');
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
             }
         }
+    }
 
-        // Auto-hide alerts after 5 seconds
-        setTimeout(function () {
-            $('.alert').fadeOut('slow');
+    // ===== NOTIFICATION SYSTEM =====
+    function showNotification(message, type) {
+        // Remove existing notifications
+        $('.custom-notification').remove();
+
+        const colors = {
+            success: { bg: '#d4edda', border: '#28a745', text: '#155724', icon: 'fa-check-circle' },
+            error: { bg: '#f8d7da', border: '#dc3545', text: '#721c24', icon: 'fa-exclamation-circle' },
+            info: { bg: '#d1ecf1', border: '#17a2b8', text: '#0c5460', icon: 'fa-info-circle' }
+        };
+
+        const color = colors[type] || colors.info;
+
+        const notification = $(`
+            <div class="custom-notification" style="
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${color.bg};
+                color: ${color.text};
+                padding: 15px 25px;
+                border-radius: 12px;
+                border-left: 4px solid ${color.border};
+                box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+                z-index: 9999;
+                font-weight: 500;
+                max-width: 400px;
+                animation: slideInRight 0.5s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            
+                <i class="fas ${color.icon}" style="font-size: 20px;"></i>
+                <span style="flex: 1;">${message}</span>
+                <button type="button" onclick="$(this).closest('.custom-notification').remove()" style="
+                    background: none;
+                    border: none;
+                    font-size: 20px;
+                    cursor: pointer;
+                    color: ${color.text};
+                    padding: 0 5px;
+                ">&times;</button>
+            </div>
+        `);
+
+        $('body').append(notification);
+
+        // Auto-remove after 5 seconds
+        setTimeout(function() {
+            notification.fadeOut('slow', function() {
+                $(this).remove();
+            });
         }, 5000);
-    </script>
+    }
+
+    // ===== UPDATE QUANTITY INPUT HANDLING =====
+    $(document).ready(function() {
+        // Handle quantity input changes
+        $('.quantity-input').on('change', function() {
+            const cartItemId = $(this).data('cartitemid');
+            const newQuantity = $(this).val();
+            updateQuantity(cartItemId, newQuantity);
+        });
+
+        // Handle quantity input keypress (Enter key)
+        $('.quantity-input').on('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const cartItemId = $(this).data('cartitemid');
+                const newQuantity = $(this).val();
+                updateQuantity(cartItemId, newQuantity);
+            }
+        });
+
+        // Prevent negative numbers in quantity input
+        $('.quantity-input').on('keydown', function(e) {
+            if (e.key === '-' || e.key === 'e') {
+                e.preventDefault();
+            }
+        });
+
+        // ===== AUTO-HIDE ALERTS =====
+        setTimeout(function () {
+            $('.alert').fadeOut('slow', function() {
+                $(this).remove();
+            });
+        }, 5000);
+    });
+
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+        @@keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
 }

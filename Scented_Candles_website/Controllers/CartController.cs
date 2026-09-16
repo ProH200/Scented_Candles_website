@@ -51,117 +51,152 @@ namespace ScentedCandleWebsite.Controllers
             return View(cartItems);
         }
 
-        // POST: /Cart/AddToCart/{productId}
+        // POST: /Cart/AddToCart (Simplified - handles both AJAX and form POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
         {
-            var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userId))
+            try
             {
-                return Json(new { success = false, message = "Please login to add items to cart." });
-            }
-
-            var product = await _context.Products.FindAsync(productId);
-            if (product == null)
-            {
-                return Json(new { success = false, message = "Product not found." });
-            }
-
-            if (product.StockQuantity < quantity)
-            {
-                return Json(new { success = false, message = "Not enough stock available." });
-            }
-
-            var existingItem = await _context.CartItems
-                .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
-
-            if (existingItem != null)
-            {
-                existingItem.Quantity += quantity;
-                _context.Update(existingItem);
-            }
-            else
-            {
-                var cartItem = new CartItem
+                // Check if user is authenticated
+                if (!User.Identity.IsAuthenticated)
                 {
-                    UserId = userId,
-                    ProductId = productId,
-                    Quantity = quantity,
-                    AddedDate = DateTime.UtcNow
-                };
-                _context.CartItems.Add(cartItem);
+                    TempData["Error"] = "Please login to add items to cart.";
+                    return RedirectToAction("Login", "Account", new { returnUrl = Request.Headers["Referer"].ToString() });
+                }
+
+                var userId = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    TempData["Error"] = "User not found. Please login again.";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                // Get the product
+                var product = await _context.Products.FindAsync(productId);
+                if (product == null)
+                {
+                    TempData["Error"] = "Product not found.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                // Check if product is active and in stock
+                if (!product.IsActive || product.StockQuantity <= 0)
+                {
+                    TempData["Error"] = "Product is not available.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                // Check if item already exists in cart
+                var existingItem = await _context.CartItems
+                    .FirstOrDefaultAsync(c => c.ProductId == productId && c.UserId == userId);
+
+                if (existingItem != null)
+                {
+                    existingItem.Quantity += quantity;
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = $"Updated quantity for {product.Name}.";
+                }
+                else
+                {
+                    // Create new cart item
+                    var cartItem = new CartItem
+                    {
+                        UserId = userId,
+                        ProductId = productId,
+                        Quantity = quantity,
+                        AddedDate = DateTime.UtcNow
+                    };
+
+                    _context.CartItems.Add(cartItem);
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = $"{product.Name} added to cart!";
+                }
+
+                // Redirect back to the page they came from
+                var referer = Request.Headers["Referer"].ToString();
+                if (!string.IsNullOrEmpty(referer))
+                {
+                    return Redirect(referer);
+                }
+                return RedirectToAction("Index", "Home");
             }
-
-            await _context.SaveChangesAsync();
-
-            var cartCount = await _context.CartItems
-                .Where(c => c.UserId == userId)
-                .SumAsync(c => c.Quantity);
-
-            return Json(new
+            catch (Exception ex)
             {
-                success = true,
-                message = $"{product.Name} added to cart!",
-                cartCount = cartCount
-            });
+                _logger.LogError(ex, "Error adding to cart");
+                TempData["Error"] = "Error adding to cart. Please try again.";
+                return RedirectToAction("Index", "Home");
+            }
         }
 
+        // GET: /Cart/Index
+        //public async Task<IActionResult> Index()
+        //{
+        //    if (!User.Identity.IsAuthenticated)
+        //    {
+        //        return RedirectToAction("Login", "Account");
+        //    }
+
+        //    var userId = _userManager.GetUserId(User);
+        //    var cartItems = await _context.CartItems
+        //        .Include(c => c.Product)
+        //        .Where(c => c.UserId == userId)
+        //        .ToListAsync();
+
+        //    ViewBag.Total = cartItems.Sum(c => c.Quantity * c.Product.Price);
+        //    return View(cartItems);
+        //}
+
+
+        // POST: /Cart/UpdateQuantity
         // POST: /Cart/UpdateQuantity
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateQuantity(int cartItemId, int quantity)
         {
-            var userId = _userManager.GetUserId(User);
-            var cartItem = await _context.CartItems
-                .Include(c => c.Product)
-                .FirstOrDefaultAsync(c => c.Id == cartItemId && c.UserId == userId);
+            try
+            {
+                var userId = _userManager.GetUserId(User);
+                var cartItem = await _context.CartItems
+                    .Include(c => c.Product)
+                    .FirstOrDefaultAsync(c => c.Id == cartItemId && c.UserId == userId);
 
-            if (cartItem == null)
-            {
-                return Json(new { success = false, message = "Item not found." });
-            }
-
-            if (quantity <= 0)
-            {
-                _context.CartItems.Remove(cartItem);
-            }
-            else
-            {
-                if (cartItem.Product != null && cartItem.Product.StockQuantity < quantity)
+                if (cartItem == null)
                 {
-                    return Json(new { success = false, message = "Not enough stock available." });
+                    return Json(new { success = false, message = "Item not found in your cart." });
                 }
+
+                if (quantity <= 0)
+                {
+                    // Remove item if quantity is 0 or less
+                    _context.CartItems.Remove(cartItem);
+                    await _context.SaveChangesAsync();
+                    return Json(new { success = true, message = "Item removed from cart." });
+                }
+
                 cartItem.Quantity = quantity;
-                _context.Update(cartItem);
-            }
-
-            await _context.SaveChangesAsync();
-
-            var cartCount = await _context.CartItems
-                .Where(c => c.UserId == userId)
-                .SumAsync(c => c.Quantity);
-
-            return Json(new { success = true, cartCount = cartCount });
-        }
-
-        // POST: /Cart/RemoveItem
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveItem(int cartItemId)
-        {
-            var userId = _userManager.GetUserId(User);
-            var cartItem = await _context.CartItems
-                .FirstOrDefaultAsync(c => c.Id == cartItemId && c.UserId == userId);
-
-            if (cartItem != null)
-            {
-                _context.CartItems.Remove(cartItem);
                 await _context.SaveChangesAsync();
-            }
 
-            return RedirectToAction(nameof(Index));
+                var cartCount = await _context.CartItems
+                    .Where(c => c.UserId == userId)
+                    .SumAsync(c => c.Quantity);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Cart updated successfully.",
+                    cartCount = cartCount
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating cart quantity");
+                return Json(new { success = false, message = "Error updating cart. Please try again." });
+            }
         }
+
+
+       
 
         // GET: /Cart/Checkout
         [HttpGet]
@@ -290,20 +325,99 @@ namespace ScentedCandleWebsite.Controllers
             return View(order);
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> GetCartCount()
+        //{
+        //    if (!User.Identity.IsAuthenticated)
+        //    {
+        //        return Json(new { count = 0 });
+        //    }
+
+        //    var userId = _userManager.GetUserId(User);
+        //    var count = await _context.CartItems
+        //        .Where(c => c.UserId == userId)
+        //        .SumAsync(c => c.Quantity);
+
+        //    return Json(new { count = count });
+        //}
+
+        // GET: /Cart/GetCount
+        // GET: /Cart/GetCartCount
         [HttpGet]
         public async Task<IActionResult> GetCartCount()
         {
-            if (!User.Identity.IsAuthenticated)
+            try
+            {
+                if (!User.Identity.IsAuthenticated)
+                {
+                    return Json(new { count = 0 });
+                }
+
+                var userId = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Json(new { count = 0 });
+                }
+
+                var count = await _context.CartItems
+                    .Where(c => c.UserId == userId)
+                    .SumAsync(c => c.Quantity);
+
+                return Json(new { count = count });
+            }
+            catch
             {
                 return Json(new { count = 0 });
             }
-
-            var userId = _userManager.GetUserId(User);
-            var count = await _context.CartItems
-                .Where(c => c.UserId == userId)
-                .SumAsync(c => c.Quantity);
-
-            return Json(new { count = count });
         }
+
+        // POST: /Cart/RemoveItem
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveItem(int cartItemId)
+        {
+            try
+            {
+                var userId = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Json(new { success = false, message = "User not found." });
+                }
+
+                var cartItem = await _context.CartItems
+                    .FirstOrDefaultAsync(c => c.Id == cartItemId && c.UserId == userId);
+
+                if (cartItem == null)
+                {
+                    return Json(new { success = false, message = "Item not found in your cart." });
+                }
+
+                // Get product name for the message
+                var productName = cartItem.Product?.Name ?? "Item";
+
+                _context.CartItems.Remove(cartItem);
+                await _context.SaveChangesAsync();
+
+                // Get updated cart count
+                var cartCount = await _context.CartItems
+                    .Where(c => c.UserId == userId)
+                    .SumAsync(c => c.Quantity);
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"{productName} removed from cart.",
+                    cartCount = cartCount
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing cart item");
+                return Json(new { success = false, message = "Error removing item. Please try again." });
+            }
+        }
+
+
     }
 }
+

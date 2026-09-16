@@ -119,7 +119,7 @@
                 <table class="table table-hover mb-0" id="ordersTable" width="100%" cellspacing="0" style="min-width: 800px;">
                     <thead style="background: #f8f9fa;">
                         <tr style="color: #4a0000;">
-                            <th style="padding: 12px 8px 12px 20px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Order ID</th>
+                            @* <th style="padding: 12px 8px 12px 20px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Order ID</th> *@
                             <th style="padding: 12px 8px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Customer</th>
                             <th style="padding: 12px 8px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Date</th>
                             <th style="padding: 12px 8px; white-space: nowrap; font-weight: 600; font-size: 0.85rem;">Items</th>
@@ -132,9 +132,9 @@
                         @foreach (var order in Model.OrderByDescending(o => o.OrderDate))
                         {
                             <tr>
-                                <td style="padding: 12px 8px 12px 20px; vertical-align: middle;">
+                                @* <td style="padding: 12px 8px 12px 20px; vertical-align: middle;">
                                     <span class="fw-bold" style="color: #800000; font-size: 0.9rem;">#@order.Id</span>
-                                </td>
+                                </td> *@
                                 <td style="padding: 12px 8px; vertical-align: middle;">
                                     <div style="font-weight: 600; color: #2c1810; font-size: 0.85rem;">@order.User?.FirstName @order.User?.LastName</div>
                                     <small class="text-muted" style="font-size: 0.75rem;">@order.User?.Email</small>
@@ -153,7 +153,8 @@
                                     <span class="fw-bold" style="color: #800000; font-size: 0.95rem;">R @order.TotalAmount.ToString("F2")</span>
                                 </td>
                                 <td style="padding: 12px 8px; vertical-align: middle;">
-                                    <form asp-action="UpdateOrderStatus" asp-controller="Admin" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to change the order status?')">
+                                    <form asp-action="UpdateOrderStatus" asp-controller="Admin" method="post" style="display: inline;"
+                                          onsubmit="return confirm('Are you sure you want to change the order status?')">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="orderId" value="@order.Id" />
                                         <select name="status" class="form-select form-select-sm status-select" onchange="this.form.submit()" style="border-color: #800000; border-radius: 20px; width: 130px; font-size: 0.75rem; padding: 4px 12px;">
@@ -535,5 +536,120 @@
                 });
             }, 5000);
         }
+  
+        function updateOrderStatus(orderId, status) {
+            // Show confirmation
+            if (!confirm('Are you sure you want to change the order status to ' + status + '?')) {
+                return;
+            }
+
+            const select = event.target;
+            const originalValue = select.value;
+            select.disabled = true;
+
+            // Get anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
+            const tokenValue = token ? token.value : '';
+
+            // Show loading state
+            const originalText = select.innerHTML;
+            select.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            $.ajax({
+                url: '@Url.Action("UpdateOrderStatus", "Admin")',
+                type: 'POST',
+                data: {
+                    orderId: orderId,
+                    status: status,
+                    __RequestVerificationToken: tokenValue
+                },
+                dataType: 'json',  // ✅ Add this to expect JSON response
+                success: function (response) {
+                    if (response.success) {
+                        // ✅ Show success notification
+                        showNotification(response.message || 'Order status updated successfully!', 'success');
+
+                        // ✅ Reload after a moment to show updated status
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showNotification(response.message || 'Error updating order status', 'error');
+                        select.value = originalValue;
+                        select.disabled = false;
+                        select.innerHTML = originalText;
+                    }
+                },
+                error: function (xhr, status, error) {
+                    showNotification('Error updating order status. Please try again.', 'error');
+                    select.value = originalValue;
+                    select.disabled = false;
+                    select.innerHTML = originalText;
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        function showNotification(message, type) {
+            // Remove existing notifications
+            $('.custom-notification').remove();
+
+            const colors = {
+                success: { bg: '#d4edda', border: '#28a745', text: '#155724', icon: 'fa-check-circle' },
+                error: { bg: '#f8d7da', border: '#dc3545', text: '#721c24', icon: 'fa-exclamation-circle' },
+                info: { bg: '#d1ecf1', border: '#17a2b8', text: '#0c5460', icon: 'fa-info-circle' }
+            };
+
+            const color = colors[type] || colors.info;
+
+            const notification = $(`
+                <div class="custom-notification" style="
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${color.bg};
+                    color: ${color.text};
+                    padding: 15px 25px;
+                    border-radius: 12px;
+                    border-left: 4px solid ${color.border};
+                    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+                    z-index: 9999;
+                    font-weight: 500;
+                    max-width: 400px;
+                    animation: slideInRight 0.5s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                ">
+                    <i class="fas ${color.icon}" style="font-size: 20px;"></i>
+                    <span>${message}</span>
+                    <button type="button" class="btn-close" onclick="$(this).closest('.custom-notification').remove()" style="margin-left: auto;"></button>
+                </div>
+            `);
+
+            $('body').append(notification);
+
+            setTimeout(function() {
+                notification.fadeOut('slow', function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        }
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 }

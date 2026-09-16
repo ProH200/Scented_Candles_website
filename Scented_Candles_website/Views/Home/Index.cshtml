@@ -12,44 +12,11 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Hidden input for authentication -->
+    <input type="hidden" id="isAuthenticated" value="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" />
+
     <style>
-        /* Newsletter Success/Error Messages */
-        .newsletter-success {
-            background: #d4edda;
-            color: #155724;
-            padding: 12px 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 4px solid #28a745;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        .newsletter-error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 12px 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 4px solid #dc3545;
-            animation: slideDown 0.3s ease-out;
-        }
-
-            .newsletter-success i,
-            .newsletter-error i {
-                margin-right: 8px;
-            }
-
-        @@keyframes slideDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
         /* ===== RESET & BASE ===== */
         * {
             margin: 0;
@@ -75,13 +42,13 @@
             position: fixed;
             right: 30px;
             bottom: 30px;
-            width: 55px;
-            height: 55px;
+            width: 50px;
+            height: 50px;
             background: #b99a85;
             color: white;
             border: none;
             border-radius: 50%;
-            font-size: 22px;
+            font-size: 20px;
             cursor: pointer;
             z-index: 999;
             transition: all 0.3s ease;
@@ -542,29 +509,29 @@
         /* ===== PRODUCTS GRID ===== */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
             margin-bottom: 50px;
         }
 
         .product-card {
             background: white;
-            border-radius: 16px;
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
             transition: all 0.4s;
             position: relative;
         }
 
             .product-card:hover {
-                transform: translateY(-6px);
-                box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             }
 
         .product-image-wrap {
             position: relative;
             overflow: hidden;
-            height: 260px;
+            height: 220px;
         }
 
             .product-image-wrap img {
@@ -580,11 +547,11 @@
 
         .product-badge {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            padding: 4px 14px;
+            top: 10px;
+            right: 10px;
+            padding: 3px 12px;
             border-radius: 50px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -606,22 +573,22 @@
         }
 
         .product-info {
-            padding: 18px 20px 20px;
+            padding: 14px 16px 16px;
         }
 
         .product-category {
-            font-size: 12px;
+            font-size: 11px;
             color: #b99a85;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .product-name {
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
             .product-name a {
@@ -635,9 +602,9 @@
                 }
 
         .product-scent {
-            font-size: 0.85em;
+            font-size: 0.8em;
             color: #7d6b5e;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
             .product-scent i {
@@ -649,22 +616,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 12px;
+            padding-top: 10px;
             border-top: 1px solid #f0e4d8;
         }
 
         .product-price {
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: 700;
             color: #2c1810;
         }
 
             .product-price .original {
-                font-size: 0.7em;
+                font-size: 0.65em;
                 color: #999;
                 text-decoration: line-through;
                 font-weight: 400;
-                margin-left: 8px;
+                margin-left: 6px;
             }
 
             .product-price .sale-price {
@@ -672,15 +639,15 @@
             }
 
         .btn-quick-add {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border: none;
             background: #f5eee9;
             color: #2c1810;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 16px;
+            font-size: 14px;
         }
 
             .btn-quick-add:hover {
@@ -692,11 +659,11 @@
         /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
         }
 
             .empty-state i {
-                font-size: 60px;
+                font-size: 50px;
                 color: #e8d9cc;
                 margin-bottom: 20px;
             }
@@ -764,34 +731,18 @@
                     background: #9c7b66;
                 }
 
-        /* Footer Styles */
+        /* ===== FOOTER ===== */
         .footer {
-            background: #2c1810;
-            color: #fff;
-            padding: 60px 0 20px;
-            margin-top: 60px;
-        }
-
-            .footer .container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 0 20px;
-            }
-
-        .footer-grid {
+            padding: 40px 0 20px;
+            border-top: 1px solid rgba(44, 24, 16, 0.08);
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
             gap: 40px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Brand Section */
         .footer-brand h3 {
+            font-family: 'Playfair Display', serif;
             font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: #fff;
         }
 
             .footer-brand h3 span {
@@ -799,138 +750,61 @@
             }
 
         .footer-brand p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            line-height: 1.8;
+            color: #7d6b5e;
+            font-size: 0.95em;
+            margin-top: 10px;
             max-width: 300px;
         }
 
-        /* Social Icons */
+        .footer h4 {
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        .footer a {
+            display: block;
+            color: #7d6b5e;
+            text-decoration: none;
+            padding: 4px 0;
+            font-size: 0.95em;
+            transition: color 0.3s;
+        }
+
+            .footer a:hover {
+                color: #b99a85;
+            }
+
         .footer-social {
             display: flex;
-            gap: 12px;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 15px;
         }
 
             .footer-social a {
-                display: inline-flex;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: #f5eee9;
+                display: flex;
                 align-items: center;
                 justify-content: center;
-                width: 38px;
-                height: 38px;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 50%;
-                color: #fff;
-                transition: all 0.3s ease;
+                color: #2c1810;
                 text-decoration: none;
+                transition: all 0.3s;
             }
 
                 .footer-social a:hover {
                     background: #b99a85;
-                    transform: translateY(-3px);
+                    color: white;
                 }
 
-        /* Footer Links */
-        .footer-links h4 {
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .footer-links a {
-            display: block;
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            padding: 6px 0;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-            .footer-links a:hover {
-                color: #b99a85;
-                padding-left: 5px;
-            }
-
-        /* Footer Bottom */
         .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            grid-column: 1 / -1;
+            text-align: center;
             padding-top: 20px;
-        }
-
-            .footer-bottom p {
-                color: rgba(255, 255, 255, 0.5);
-                font-size: 14px;
-            }
-
-        .footer-payment {
-            display: flex;
-            gap: 15px;
-            font-size: 24px;
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-            .footer-payment i {
-                transition: all 0.3s ease;
-                cursor: default;
-            }
-
-                .footer-payment i:hover {
-                    color: rgba(255, 255, 255, 0.7);
-                }
-
-        /* ===== RESPONSIVE ===== */
-        @@media (max-width: 992px) {
-            .footer-grid
-
-        {
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        }
-
-        @@media (max-width: 768px) {
-            .footer
-
-        {
-            padding: 40px 0 20px;
-        }
-
-        .footer-grid {
-            grid-template-columns: 1fr;
-            gap: 25px;
-        }
-
-        .footer-brand p {
-            max-width: 100%;
-        }
-
-        .footer-bottom {
-            flex-direction: column;
-            gap: 15px;
-            text-align: center;
-        }
-
-        }
-
-        @@media (max-width: 480px) {
-            .footer-social
-
-        {
-            justify-content: center;
-        }
-
-        .footer-links a {
-            text-align: center;
-        }
-
-        .footer-links h4 {
-            text-align: center;
-        }
-
+            border-top: 1px solid rgba(44, 24, 16, 0.08);
+            color: #7d6b5e;
+            font-size: 0.9em;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -1014,11 +888,20 @@
                 bottom: 15px;
                 font-size: 18px;
             }
+
+            .product-image-wrap {
+                height: 180px;
+            }
         }
 
         @@media (max-width: 480px) {
             .products-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .product-image-wrap {
+                height: 200px;
             }
         }
     </style>
@@ -1026,7 +909,7 @@
 <body>
     <div class="container">
         <!-- ===== NAVBAR ===== -->
-       @*  <nav class="navbar">
+        <nav class="navbar">
             <a href="/" class="navbar-brand">Scented<span>Candles</span></a>
             <div class="navbar-links">
                 <a href="/">Home</a>
@@ -1037,7 +920,7 @@
                     <span class="cart-badge">0</span>
                 </a>
             </div>
-        </nav> *@
+        </nav>
 
         <!-- ===== HERO SECTION ===== -->
         <section class="hero" id="hero">
@@ -1170,12 +1053,14 @@
                 <i class="fas fa-spinner fa-spin" style="font-size: 30px; color: #b99a85;"></i>
             </div>
 
-            <!-- Products Grid - This gets updated by AJAX -->
+            <!-- Products Grid -->
             <div id="productsContainer">
                 @if (Model.Products.Any())
                 {
-                    <div class="products-grid">
-                        @foreach (var product in Model.Products)
+                    @using Microsoft.AspNetCore.Antiforgery
+
+                <div class="products-grid">
+                    @foreach (var product in Model.Products)
                         {
                             <div class="product-card">
                                 <div class="product-image-wrap">
@@ -1216,9 +1101,24 @@
                                                 <span>R @product.Price.ToString("F2")</span>
                                             }
                                         </div>
-                                        <button class="btn-quick-add" onclick="addToCart(@product.Id)" title="Add to Cart">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
+
+                                        @if (User.Identity.IsAuthenticated)
+                                        {
+                                            <form method="post" asp-controller="Cart" asp-action="AddToCart" style="display: inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="productId" value="@product.Id" />
+                                                <input type="hidden" name="quantity" value="1" />
+                                                <button type="submit" class="btn-quick-add" title="Add to Cart">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <a href="/Account/Login?returnUrl=@Context.Request.Path" class="btn-quick-add" title="Login to add to cart" style="background: #e8d9cc; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-lock" style="font-size: 12px;"></i>
+                                            </a>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -1266,11 +1166,9 @@
         </section>
 
         <!-- ===== FOOTER ===== -->
-        @* <footer class="footer">
+        <footer class="footer">
             <div class="container">
                 <div class="footer-grid">
-                    
-
                     <!-- Quick Links -->
                     <div class="footer-links">
                         <h4>Quick Links</h4>
@@ -1299,282 +1197,67 @@
                     </div>
                 </div>
 
-       
+                <!-- Contact Info -->
+                <div class="contact-info">
+                    <h6>Contact Us</h6>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> Promisemnelisi@gmail.com</li>
+                        <li><i class="fas fa-phone"></i> 066 139-0332</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Park Place, Port Elizabeth, Eastern Cape</li>
+                        <li><i class="fas fa-clock"></i> Mon-Fri: 08:00 AM - 4:00 PM</li>
+                    </ul>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; @DateTime.Now.Year Scented Candles. All rights reserved.</p>
+                </div>
             </div>
-        </footer> *@
+        </footer>
     </div>
 
     <script>
-        // ===== SCROLL ARROW =====
-        document.getElementById('scrollArrow').addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-
-        // Show/hide scroll arrow based on scroll position
-        window.addEventListener('scroll', function () {
-            const arrow = document.getElementById('scrollArrow');
-            const heroSection = document.getElementById('hero');
-            const heroBottom = heroSection.getBoundingClientRect().bottom;
-
-            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50) {
-                arrow.style.opacity = '0';
-                arrow.style.pointerEvents = 'none';
-            } else if (heroBottom < 0) {
-                arrow.style.opacity = '1';
-                arrow.style.pointerEvents = 'auto';
-            } else {
-                arrow.style.opacity = '1';
-                arrow.style.pointerEvents = 'auto';
-            }
-        });
-
-        // ===== LIVE SEARCH =====
-        let searchTimeout;
-        const searchInput = document.getElementById('liveSearch');
-        const productsContainer = document.getElementById('productsContainer');
-        const loadingSpinner = document.getElementById('searchLoading');
-        const clearButton = document.getElementById('clearSearch');
-        const searchButton = document.getElementById('searchButton');
-        const productCount = document.getElementById('productCount');
-
-        // Get current filter values
-        function getCurrentFilters() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                category: params.get('category') || '',
-                sort: params.get('sort') || 'name'
-            };
-        }
-
-        // Perform live search
-        function performSearch(query) {
-            const filters = getCurrentFilters();
-
-            // Show loading spinner
-            if (loadingSpinner) {
-                loadingSpinner.style.display = 'block';
-            }
-
-            // Build the URL with parameters
-            const url = new URL('/Home/SearchProducts', window.location.origin);
-            url.searchParams.append('search', query);
-            url.searchParams.append('category', filters.category);
-            url.searchParams.append('sort', filters.sort);
-
-            // Make AJAX request
-            fetch(url.toString(), {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-                .then(response => response.text())
-                .then(html => {
-                    // Update the products container
-                    if (productsContainer) {
-                        productsContainer.innerHTML = html;
-                    }
-
-                    // Hide loading spinner
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
-                    }
-
-                    // Update product count
-                    if (productCount) {
-                        const count = productsContainer.querySelectorAll('.product-card').length;
-                        productCount.textContent = count + ' products';
-                    }
-
-                    // Update the URL without refreshing the page
-                    const newUrl = new URL(window.location.href);
-                    if (query) {
-                        newUrl.searchParams.set('search', query);
-                    } else {
-                        newUrl.searchParams.delete('search');
-                    }
-                    window.history.pushState({}, '', newUrl);
-
-                    // Show/hide clear button
-                    if (clearButton) {
-                        clearButton.style.display = query.length > 0 ? 'block' : 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('Search error:', error);
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
-                    }
-                });
-        }
-
-        // Listen for input events with debounce
-        if (searchInput) {
-            searchInput.addEventListener('input', function () {
-                const query = this.value;
-
-                // Clear previous timeout
-                clearTimeout(searchTimeout);
-
-                // If query is empty, search immediately
-                if (query === '') {
-                    performSearch('');
-                    return;
-                }
-
-                // Debounce: wait 300ms after user stops typing
-                searchTimeout = setTimeout(() => {
-                    performSearch(query);
-                }, 300);
-            });
-
-            // Search on Enter key
-            searchInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    clearTimeout(searchTimeout);
-                    performSearch(this.value);
-                }
-            });
-
-            // Focus the search input on Ctrl+F or Cmd+F
-            document.addEventListener('keydown', function (e) {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-                    e.preventDefault();
-                    if (searchInput) {
-                        searchInput.focus();
-                        searchInput.select();
-                    }
-                }
-            });
-        }
-
-        // Clear search button
-        if (clearButton) {
-            clearButton.addEventListener('click', function () {
-                if (searchInput) {
-                    searchInput.value = '';
-                    performSearch('');
-                    searchInput.focus();
-                }
-            });
-        }
-
-        // Search button click - FIXED
-        if (searchButton) {
-            searchButton.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (searchInput) {
-                    performSearch(searchInput.value);
-                }
-            });
-        }
-
-        // Handle browser back/forward buttons
-        window.addEventListener('popstate', function () {
-            const params = new URLSearchParams(window.location.search);
-            const search = params.get('search') || '';
-            if (searchInput) {
-                searchInput.value = search;
-            }
-            performSearch(search);
-        });
-
-        // ===== ADD TO CART =====
-        function addToCart(productId) {
-            fetch('/Cart/Add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ productId: productId, quantity: 1 })
-            })
-                .then(response => {
-                    if (response.ok) {
-                        showNotification('Added to cart! 🛍️', 'success');
-                        updateCartCount();
-                    } else {
-                        showNotification('Please login to add to cart', 'info');
-                    }
-                })
-                .catch(() => showNotification('Error adding to cart', 'error'));
-        }
-
-        // Update cart count
-        function updateCartCount() {
-            fetch('/Cart/GetCount')
+        // ===== UPDATE CART BADGE =====
+        function updateCartBadge() {
+            fetch('/Cart/GetCartCount')
                 .then(response => response.json())
-                .then(count => {
+                .then(data => {
+                    const count = data.count || 0;
                     const badge = document.querySelector('.cart-badge');
                     if (badge) {
-                        badge.textContent = count;
-                        badge.style.display = count > 0 ? 'flex' : 'none';
+                        if (count > 0) {
+                            badge.textContent = count;
+                            badge.style.display = 'flex';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                    // Also update the navbar badge if it exists
+                    const navBadge = document.getElementById('cartCountBadge');
+                    if (navBadge) {
+                        if (count > 0) {
+                            navBadge.textContent = count;
+                            navBadge.style.display = 'block';
+                        } else {
+                            navBadge.style.display = 'none';
+                        }
                     }
                 })
-                .catch(() => { });
+                .catch(() => {});
         }
-
-        // Notification system
-        function showNotification(message, type) {
-            const colors = {
-                success: '#4CAF50',
-                error: '#f44336',
-                info: '#2196F3'
-            };
-
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                        position: fixed;
-                        bottom: 30px;
-                        right: 30px;
-                        padding: 16px 28px;
-                        background: ${colors[type] || '#2196F3'};
-                        color: white;
-                        border-radius: 12px;
-                        z-index: 9999;
-                        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-                        animation: slideUp 0.4s ease;
-                        font-weight: 500;
-                        max-width: 400px;
-                    `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.style.animation = 'slideDown 0.4s ease';
-                setTimeout(() => notification.remove(), 400);
-            }, 3500);
-        }
-
-        // Add animation styles
-        const style = document.createElement('style');
-        style.textContent = `
-                    @@keyframes slideUp {
-                        from { transform: translateY(100px); opacity: 0; }
-                        to { transform: translateY(0); opacity: 1; }
-                    }
-                    @@keyframes slideDown {
-                        from { transform: translateY(0); opacity: 1; }
-                        to { transform: translateY(100px); opacity: 0; }
-                    }
-                `;
-        document.head.appendChild(style);
 
         // Update cart count on page load
-        document.addEventListener('DOMContentLoaded', function () {
-            updateCartCount();
-
-            // Show clear button if there's a search term
-            if (searchInput && searchInput.value.length > 0 && clearButton) {
-                clearButton.style.display = 'block';
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartBadge();
         });
+
+        // Show/hide alerts after 5 seconds
+        setTimeout(function () {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                alert.style.transition = 'opacity 1s';
+                alert.style.opacity = '0';
+                setTimeout(function() { alert.remove(); }, 1000);
+            });
+        }, 5000);
     </script>
 </body>
 </html>

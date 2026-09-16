@@ -25,6 +25,13 @@ namespace ScentedCandleWebsite.Controllers
             _emailService = emailService;  // ← Make sure this assignment exists
         }
 
+        // GET: /Account/IsAuthenticated
+        [HttpGet]
+        public IActionResult IsAuthenticated()
+        {
+            return Json(new { isAuthenticated = User.Identity?.IsAuthenticated ?? false });
+        }
+
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
         {

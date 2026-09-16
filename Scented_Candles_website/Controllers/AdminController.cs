@@ -468,6 +468,8 @@ namespace ScentedCandleWebsite.Controllers
         {
             return _context.Products.Any(e => e.Id == id);
         }
+
+
         // POST: /Admin/DeleteProduct
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -498,14 +500,16 @@ namespace ScentedCandleWebsite.Controllers
                 var order = await _context.Orders.FindAsync(orderId);
                 if (order == null)
                 {
-                    return Json(new { success = false, message = "Order not found." });
+                    TempData["Error"] = "Order not found.";
+                    return RedirectToAction(nameof(Orders));
                 }
 
                 // Validate status
                 var validStatuses = new[] { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" };
                 if (!validStatuses.Contains(status))
                 {
-                    return Json(new { success = false, message = "Invalid status." });
+                    TempData["Error"] = "Invalid status.";
+                    return RedirectToAction(nameof(Order));
                 }
 
                 // Update order
@@ -519,13 +523,15 @@ namespace ScentedCandleWebsite.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = $"Order #{orderId} status updated to {status}." });
+                TempData["Success"] = $"Order #{orderId} status updated to {status}.";
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating order status");
-                return Json(new { success = false, message = "Error updating order status: " + ex.Message });
+                TempData["Error"] = "Error updating order status: " + ex.Message;
             }
+
+            return RedirectToAction(nameof(Orders));
         }
 
         // GET: /Admin/GetOrderDetails

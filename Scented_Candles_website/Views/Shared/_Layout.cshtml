@@ -10,6 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
+    @Html.AntiForgeryToken()
+
+    <!-- Add hidden input for authentication status -->
+    <input type="hidden" id="isAuthenticated" value="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" />
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark shadow-sm" style="background: linear-gradient(135deg, #800000 0%, #5a0000 100%);">
             <div class="container-fluid">
@@ -165,7 +169,7 @@
     </div>
 
     <!-- ===== FOOTER ===== -->
-    <footer class="footer" style="background: #2c1810; color: white; padding: 60px 0 30px;">
+   @*  <footer class="footer" style="background: #2c1810; color: white; padding: 60px 0 30px;">
         <div class="container">
             <div class="row g-4">
                 <!-- Brand Section -->
@@ -178,27 +182,7 @@
                     </p>
                 </div>
 
-                @* <!-- Quick Links -->
-                <div class="col-lg-2 col-md-6">
-                    <h6 class="fw-bold mb-3" style="color: #b99a85; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">Quick Links</h6>
-                    <ul class="list-unstyled" style="font-size: 0.9rem;">
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none" style="transition: all 0.3s;">Shop All</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none" style="transition: all 0.3s;">New Arrivals</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none" style="transition: all 0.3s;">Best Sellers</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none" style="transition: all 0.3s;">On Sale</a></li>
-                    </ul>
-                </div> *@
-
-                @* <!-- Customer Service -->
-                <div class="col-lg-3 col-md-6">
-                    <h6 class="fw-bold mb-3" style="color: #b99a85; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">Customer Service</h6>
-                    <ul class="list-unstyled" style="font-size: 0.9rem;">
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none" style="transition: all 0.3s;">Shipping Info</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none" style="transition: all 0.3s;">Returns Policy</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none" style="transition: all 0.3s;">FAQs</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none" style="transition: all 0.3s;">Track Order</a></li>
-                    </ul>
-                </div> *@
+                
 
                 <!-- Contact Info -->
                 <div class="col-lg-3 col-md-6">
@@ -244,7 +228,7 @@
                 </div>
             </div>
         </div>
-    </footer>
+    </footer> *@
 
     <style>
         /* Social Links Hover Effect */
@@ -290,46 +274,244 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
-        // Function to update cart count badge
-        function updateCartCount() {
-            if (@(User.Identity?.IsAuthenticated == true ? "true" : "false")) {
-                $.ajax({
-                    url: '@Url.Action("GetCartCount", "Cart")',
-                    type: 'GET',
-                    success: function (data) {
-                        if (data.count > 0) {
-                            $('#cartCountBadge').text(data.count).show();
-                        } else {
-                            $('#cartCountBadge').hide();
-                        }
-                    },
-                    error: function () {
-                        console.log('Error fetching cart count');
+        // ===== ADD TO CART FROM HOME PAGE =====
+    function addToCart(productId, buttonElement) {
+        // Show loading state
+        const originalHtml = buttonElement.innerHTML;
+        buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        buttonElement.disabled = true;
+
+        // Get anti-forgery token
+        const token = document.querySelector('input[name="__RequestVerificationToken"]');
+        const tokenValue = token ? token.value : '';
+
+        fetch('/Cart/Add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                productId: productId,
+                quantity: 1,
+                __RequestVerificationToken: tokenValue
+            })
+        })
+        .then(response => {
+            // Check if response is ok (status 200-299)
+            if (!response.ok) {
+                // If status is 401 (Unauthorized), redirect to login
+                if (response.status === 401) {
+                    window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    return;
+                }
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message || 'Added to cart! 🛍️', 'success');
+                updateCartCount(data.cartCount);
+                
+                // Reset button
+                buttonElement.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalHtml;
+                    buttonElement.disabled = false;
+                }, 1500);
+            } else {
+                if (data.message && data.message.toLowerCase().includes('login')) {
+                    window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    return;
+                }
+                showNotification(data.message || 'Error adding to cart', 'error');
+                buttonElement.innerHTML = originalHtml;
+                buttonElement.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // If the fetch fails, check if user is authenticated
+            fetch('/Account/IsAuthenticated')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.isAuthenticated) {
+                        window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    } else {
+                        showNotification('Error adding to cart. Please try again.', 'error');
+                        buttonElement.innerHTML = originalHtml;
+                        buttonElement.disabled = false;
                     }
                 });
+        });
+    }
+
+    // ===== CHECK AUTHENTICATION =====
+    function checkAuth() {
+        fetch('/Account/IsAuthenticated')
+            .then(response => response.json())
+            .then(data => {
+                if (data.isAuthenticated) {
+                    // User is logged in, update cart count
+                    updateCartCount();
+                }
+            })
+            .catch(() => {});
+    }
+
+    // ===== UPDATE CART BADGE =====
+    function updateCartCount(count) {
+        // If count is not provided, fetch it
+        if (count === undefined) {
+            fetch('/Cart/GetCount')
+                .then(response => response.json())
+                .then(data => {
+                    updateCartBadge(data);
+                })
+                .catch(() => {});
+            return;
+        }
+        
+        updateCartBadge(count);
+    }
+
+    function updateCartBadge(count) {
+        const badge = document.querySelector('.cart-badge');
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
             }
         }
+    }
 
-        // Update cart count on page load
-        $(document).ready(function () {
-            updateCartCount();
-        });
+    // ===== NOTIFICATION SYSTEM =====
+    function showNotification(message, type) {
+        // Remove existing notifications
+        const existing = document.querySelector('.custom-notification');
+        if (existing) existing.remove();
 
-        // Auto-hide alerts after 5 seconds
-        setTimeout(function () {
-            $('.alert').fadeOut('slow');
+        const colors = {
+            success: { bg: '#d4edda', border: '#28a745', text: '#155724', icon: 'fa-check-circle' },
+            error: { bg: '#f8d7da', border: '#dc3545', text: '#721c24', icon: 'fa-exclamation-circle' },
+            info: { bg: '#d1ecf1', border: '#17a2b8', text: '#0c5460', icon: 'fa-info-circle' }
+        };
+
+        const color = colors[type] || colors.info;
+
+        const notification = document.createElement('div');
+        notification.className = 'custom-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${color.bg};
+            color: ${color.text};
+            padding: 15px 25px;
+            border-radius: 12px;
+            border-left: 4px solid ${color.border};
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            z-index: 9999;
+            font-weight: 500;
+            max-width: 400px;
+            animation: slideInRight 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        `;
+        notification.innerHTML = `
+            <i class="fas ${color.icon}" style="font-size: 20px;"></i>
+            <span style="flex: 1;">${message}</span>
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: ${color.text};">&times;</button>
+        `;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            if (notification) {
+                notification.style.animation = 'slideOutRight 0.5s ease';
+                setTimeout(() => notification.remove(), 500);
+            }
         }, 5000);
+    }
 
-        // Add active class to current nav item
-        $(document).ready(function () {
-            var currentUrl = window.location.pathname;
-            $('.navbar-nav .nav-link').each(function () {
-                if ($(this).attr('href') === currentUrl) {
-                    $(this).addClass('active');
-                    $(this).css('font-weight', 'bold');
-                }
-            });
-        });
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+        @@keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @@keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ===== ON PAGE LOAD =====
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check authentication status
+        checkAuth();
+        
+        // Update cart count on page load
+        updateCartCount();
+    });
+<
+        // Function to update cart count badge
+        // function updateCartCount() {
+        //     if (@(User.Identity?.IsAuthenticated == true ? "true" : "false")) {
+        //         $.ajax({
+        //             url: '@Url.Action("GetCartCount", "Cart")',
+        //             type: 'GET',
+        //             success: function (data) {
+        //                 if (data.count > 0) {
+        //                     $('#cartCountBadge').text(data.count).show();
+        //                 } else {
+        //                     $('#cartCountBadge').hide();
+        //                 }
+        //             },
+        //             error: function () {
+        //                 console.log('Error fetching cart count');
+        //             }
+        //         });
+        //     }
+        // }
+
+        // // Update cart count on page load
+        // $(document).ready(function () {
+        //     updateCartCount();
+        // });
+
+        // // Auto-hide alerts after 5 seconds
+        // setTimeout(function () {
+        //     $('.alert').fadeOut('slow');
+        // }, 5000);
+
+        // // Add active class to current nav item
+        // $(document).ready(function () {
+        //     var currentUrl = window.location.pathname;
+        //     $('.navbar-nav .nav-link').each(function () {
+        //         if ($(this).attr('href') === currentUrl) {
+        //             $(this).addClass('active');
+        //             $(this).css('font-weight', 'bold');
+        //         }
+        //     });
+        // });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
